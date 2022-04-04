@@ -1,0 +1,15 @@
+{
+    "name": "kimjeongguk/training",
+    "autoload": {
+        "psr-4": {
+            "app\\": "./"
+        }
+    },
+    "authors": [
+        {
+            "name": "JeongKuk Kim",
+            "email": "trewq1009@gmail.com"
+        }
+    ],
+    "require": {}
+}

@@ -1,0 +1,10 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    min-height: 10rem;
+}
+
+.header_c p {
+    font-size: 6rem;
+}

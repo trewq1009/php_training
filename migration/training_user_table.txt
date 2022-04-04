@@ -1,0 +1,21 @@
+﻿-- tr_account Table Create SQL
+CREATE TABLE tr_account
+(
+    `no`            INT             NOT NULL    AUTO_INCREMENT COMMENT 'AI Index', 
+    `id`            VARCHAR(45)     NOT NULL    COMMENT '아이디', 
+    `pw`            VARCHAR(100)    NOT NULL    COMMENT '패스워드', 
+    `name`          VARCHAR(45)     NOT NULL    COMMENT '이름', 
+    `email`         VARCHAR(45)     NOT NULL    COMMENT '이메일', 
+    `email_status`  VARCHAR(45)     NULL        DEFAULT 'INACTIVE' COMMENT '이메일 인증', 
+    `status`        VARCHAR(45)     NULL        DEFAULT 'ALIVE' COMMENT '회원 상태', 
+    `registered`    TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '가입 일자', 
+    `updated`       TIMESTAMP       NULL        COMMENT '업데이트 날자', 
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_account COMMENT '회원 테이블';
+
+CREATE UNIQUE INDEX UQ_tr_account_1
+    ON tr_account(id, email);
+
+
