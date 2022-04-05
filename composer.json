@@ -11,5 +11,7 @@
             "email": "trewq1009@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "phpmailer/phpmailer": "^6.6"
+    }
 }

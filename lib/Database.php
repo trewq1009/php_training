@@ -67,11 +67,11 @@ class Database
             } else {
                 $this->pdo->rollBack();
                 $this->pdo->commit();
-                throw new \Exception('회원 가입에 실패 하였습니다. 다시 시도해 주세요');
+                return false;
             }
         } catch (\Exception $e) {
             $this->pdo->rollBack();
-            die($e->getMessage());
+            return false;
         }
     }
 
