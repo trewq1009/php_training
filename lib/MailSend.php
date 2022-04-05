@@ -81,7 +81,7 @@ class MailSend
     public function getLink($userData)
     {
         $crypt = password_hash($userData['userPw'], PASSWORD_BCRYPT);
-        return APP_SITE.'/view/account?training='.$userData['userId'].'&hash='.$crypt;
+        return APP_SITE.'/view/account.php?training='.$userData['userId'].'&hash='.$crypt;
     }
 
 

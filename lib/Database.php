@@ -79,14 +79,14 @@ class Database
     public function findOne($tableName, $where, $params) {
         try {
 
-            $sql = implode("AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
 
             $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
             foreach ($where as $item) {
                 $statement->bindValue(":$item", $params[$item]);
             }
+
             $statement->execute();
-            
             return $statement->fetch();
             
         } catch (\Exception $e) {

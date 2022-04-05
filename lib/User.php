@@ -22,6 +22,7 @@ class User
         $this->mail = new MailSend;
     }
 
+
     /**
      * @return string[]
      * [InputName => DB TableName]
@@ -41,18 +42,17 @@ class User
     }
 
 
-    public function register($post) {
-        $this->userId = $post['userId'];
-        $this->userName = $post['userName'];
-        $this->userEmail = $post['userEmail'];
+    public function register($postData) {
+        $this->userId = $postData['userId'];
+        $this->userName = $postData['userName'];
+        $this->userEmail = $postData['userEmail'];
 
         // 가입을 위한 Validation 작업
-        $userData = $this->util->registedValidation($this->getTableName(), $this->rule(), $post);
+        $userData = $this->util->registedValidation($this->getTableName(), $this->rule(), $postData);
         if(count($userData) <= 1) {
             $this->session->setSession('error', $userData['error']);
             return;
         }
-
 
         // DB 연결 & 저장
         if(!$this->db->save($this->getTableName(), $this->rule(), $userData)) {
@@ -64,7 +64,7 @@ class User
         // 그리고 메인 화면 리다이렉트 하며 메시지 전송?
 
         if(!$this->mail->sendRegisterEmail($userData)) {
-            $this->session->setSession('success', '이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
+            $this->session->setSession('error', '이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
             header('Location: /');
             exit();
         }
@@ -75,8 +75,31 @@ class User
     }
 
 
+    public function logIn($postData) {
+        $this->userId = $postData['userId'];
+
+        $userData = $this->db->findOne($this->getTableName(), ['id', 'status'], ['id' => $this->userId, 'status' => 'ALIVE']);
+        if(!$userData) {
+            $this->session->setSession('error', '계정을 다시 확인 해주세요.');
+            return;
+        }
+        // Email 미 인증 유저 Validation
+        if($userData['email_status'] == 'INACTIVE') {
+            $this->session->setSession('error', '이메일 인증을 완료하지 않았습니다. 메일 인증을 해주세요.');
+            return;
+        }
+
+        $this->session->setSession('auth', $userData);
+        header('Location: /');
+        exit();
+    }
 
 
+    public function logOut() {
+        $this->session->removeSession('auth');
+        header('Location: /');
+        exit();
+    }
 
 
 }
