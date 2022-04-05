@@ -8,8 +8,22 @@ class User
     public string $userId = '';
     public string $userName = '';
     public string $userEmail = '';
+    public $db;
+    public $util;
+    public $session;
 
 
+    public function __construct()
+    {
+        $this->db = new Database;
+        $this->util = new Utils;
+        $this->session = new Session;
+    }
+
+    /**
+     * @return string[]
+     * [InputName => DB TableName]
+     */
     private function rule() {
         return [
             'userId' => 'id',
@@ -18,6 +32,7 @@ class User
             'userName' => 'name'
         ];
     }
+
 
     private function getTableName() {
         return 'tr_account';
@@ -30,13 +45,18 @@ class User
         $this->userEmail = $post['userEmail'];
 
 
-        $userData = (new Utils)->validation($this->rule(), $post);
-        if(gettype($userData) !== 'array') {
-            var_dump($userData);
+        $userData = $this->util->registedValidation($this->getTableName(), $this->rule(), $post);
+        if(count($userData) <= 1) {
+            $this->session->setSession('error', $userData['error']);
+            return;
         }
-        // DB 연결
-        if((new Database)->save($this->getTableName(), $this->rule(), $userData)) {
-            (new Session)->setSession('userData', ['test'=>'test', 't1'=> '우승']);
+
+
+        // DB 연결 & 저장
+        if($this->db->save($this->getTableName(), $this->rule(), $userData)) {
+            $this->session->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
+            header('Location: /');
+            exit();
         } else {
             throw new \Exception('Test중 다시 시도하세요');
         }

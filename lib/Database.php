@@ -29,20 +29,21 @@ class Database
 
 
     public function save($tableName, $rule, $data) {
-        // db 컬럼값 추출, 실제 들어온 데이터 이름
-        $dbValueName = $realName = [];
-
-        foreach ($rule as $key => $value) {
-            $dbValueName[] = $value;
-            $realName[] = $key;
-        }
-
-        // transaction 알아보고 적용할것
-        // try catch 문도 적절히 사용할 것
-        // query 각각 컬럼명 바인딩 준비
-        $params = array_map(fn($attr) => ":$attr", $realName);
-
         try {
+            // db 컬럼값 추출, 실제 들어온 데이터 이름
+            $dbValueName = $realName = [];
+
+            foreach ($rule as $key => $value) {
+                $dbValueName[] = $value;
+                $realName[] = $key;
+            }
+
+            // transaction 알아보고 적용할것
+            // try catch 문도 적절히 사용할 것
+            // query 각각 컬럼명 바인딩 준비
+            $params = array_map(fn($attr) => ":$attr", $realName);
+
+
             // 트랜잭션 시작
             $this->pdo->beginTransaction();
 
@@ -64,6 +65,8 @@ class Database
 
                 return true;
             } else {
+                $this->pdo->rollBack();
+                $this->pdo->commit();
                 throw new \Exception('회원 가입에 실패 하였습니다. 다시 시도해 주세요');
             }
         } catch (\Exception $e) {
@@ -72,5 +75,23 @@ class Database
         }
     }
 
+
+    public function findOne($tableName, $where, $params) {
+        try {
+
+            $sql = implode("AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
+            foreach ($where as $item) {
+                $statement->bindValue(":$item", $params[$item]);
+            }
+            $statement->execute();
+            
+            return $statement->fetch();
+            
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
 }
