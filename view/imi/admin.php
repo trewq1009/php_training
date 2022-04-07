@@ -1,12 +1,13 @@
 <?php
-require_once __DIR__.'/layout/head.php';
+require_once __DIR__.'/../../layout/imi/head.php';
+
 use app\lib\Session;
 
 
-
 /* 헤더 레이아웃 */
-require_once __DIR__.'/layout/header.php'
+require_once __DIR__.'/../../layout/imi/header.php'
 ?>
+
 
     <section class="container">
         <?php if(Session::isSet('success')): ?>
@@ -19,7 +20,7 @@ require_once __DIR__.'/layout/header.php'
             </div>
         <?php endif; ?>
         <div>
-            <h3>Hello PHP</h3>
+            <h3>Hello ADMIN</h3>
         </div>
     </section>
 
@@ -28,5 +29,6 @@ require_once __DIR__.'/layout/header.php'
     <footer>
 
     </footer>
-</body>
+    </body>
 </html>
+
