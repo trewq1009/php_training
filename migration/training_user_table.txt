@@ -26,7 +26,7 @@ CREATE TABLE tr_account_admin
 (
     `no`          INT            NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
     `id`          VARCHAR(45)    NOT NULL    COMMENT '아이디',
-    `pw`          VARCHAR(45)    NOT NULL    COMMENT '패스워드',
+    `pw`          VARCHAR(100)    NOT NULL    COMMENT '패스워드',
     `name`        VARCHAR(45)    NOT NULL    COMMENT '관리자명',
     `authority`   INT            NULL        DEFAULT 0 COMMENT '권한(0:최고)',
     `status`      VARCHAR(45)    NULL        DEFAULT 'ALIVE' COMMENT '계정 상태',
