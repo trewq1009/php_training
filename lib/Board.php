@@ -5,6 +5,7 @@ class Board
 {
     protected $field;
     protected $db;
+    protected $session;
     public int $page = 1;
     public string $url;
     public $listHtml;
@@ -14,6 +15,7 @@ class Board
     {
         $this->field = new Field;
         $this->db = new Database;
+        $this->session = new Session;
     }
 
     protected function rule()
@@ -44,7 +46,8 @@ class Board
         unset($resultArr['listData']);
         $resultArr['page'] = $this->page;
         $this->listBtn = $this->field->listBtn($resultArr);
-
-        return true;
     }
+
+
+
 }

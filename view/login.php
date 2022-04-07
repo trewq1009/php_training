@@ -4,12 +4,11 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 use app\lib\User;
 use app\lib\Session;
 
-
-    $method = (new app\lib\Utils)->getMethod($_SERVER);
-    if($method === 'post') {
-        $userModel = new User();
-        $userModel->logIn($_POST);
-    }
+$method = (new app\lib\Utils)->getMethod($_SERVER);
+if($method === 'post') {
+    $userModel = new User();
+    $userModel->logIn($_POST);
+}
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';

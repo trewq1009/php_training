@@ -25,7 +25,8 @@ class User
      * @return string[]
      * [InputName => DB TableName]
      */
-    private function rule() {
+    private function rule()
+    {
         return [
             'userId' => 'id',
             'userPw' => 'pw',
@@ -35,12 +36,14 @@ class User
     }
 
 
-    private function getTableName() {
+    private function getTableName()
+    {
         return 'tr_account';
     }
 
 
-    public function register($postData) {
+    public function register($postData)
+    {
         $this->userId = $postData['userId'];
         $this->userName = $postData['userName'];
         $this->userEmail = $postData['userEmail'];
@@ -73,7 +76,8 @@ class User
     }
 
 
-    public function logIn($postData) {
+    public function logIn($postData)
+    {
         $this->userId = $postData['userId'];
 
         $userData = $this->db->findOne($this->getTableName(), ['id', 'status'], ['id' => $this->userId, 'status' => 'ALIVE']);
@@ -98,7 +102,8 @@ class User
     }
 
 
-    public function logOut() {
+    public function logOut()
+    {
         $this->session->removeSession('auth');
         header('Location: /');
         exit();
@@ -135,12 +140,14 @@ class User
 
         $updateUserData = $this->db->findOne($this->getTableName(), ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
         $this->session->setSession('auth', $updateUserData);
+        $this->session->setSession('success', '정보 수정 완료 되었습니다.');
         header('Location: /');
         exit();
     }
 
 
-    public function delete($deleteData) {
+    public function delete($deleteData)
+    {
         // update 성공하면 true 반환
         if(!$this->db->update($this->getTableName(), ['status' => 'status'], ['no' => $deleteData['no']], ['status' => 'AWAIT'])) {
             $this->session->setSession('error', '회원 탈퇴 신청이 실패 했습니다.');
@@ -155,7 +162,8 @@ class User
 
 
     // 이메일 인증
-    public function emailAuthentication($getData) {
+    public function emailAuthentication($getData)
+    {
         if(!isset($getData['training'])) {
             $this->session->setSession('error', 'URL 이 올바르지 않습니다.');
             header('Location: /');
@@ -177,8 +185,6 @@ class User
         $this->session->setSession('success', '이메일 인증이 완료 되었습니다. 로그인 해주세요.');
         header('Location: /');
         exit();
-
-
     }
 
 }

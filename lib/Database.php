@@ -1,5 +1,4 @@
 <?php
-
 namespace app\lib;
 
 use PDO;
@@ -11,7 +10,8 @@ class Database
 {
     public \PDO $pdo;
 
-    public function __construct() {
+    public function __construct()
+    {
         // 생성시 디비 연결 후 테스트 까지
         // 미 연결시 디비 오류
         try {
@@ -28,7 +28,8 @@ class Database
     }
 
 
-    public function save($tableName, $rule, $data) {
+    public function save($tableName, $rule, $data)
+    {
         try {
             // db 컬럼값 추출, 실제 들어온 데이터 이름
             $dbValueName = $realName = [];
@@ -73,7 +74,8 @@ class Database
     }
 
 
-    public function findOne($tableName, $where, $params) {
+    public function findOne($tableName, $where, $params)
+    {
         try {
 
             $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
@@ -92,7 +94,8 @@ class Database
     }
 
 
-    public function update($tableName, $rule, $where, $params) {
+    public function update($tableName, $rule, $where, $params)
+    {
         try {
 
             $sql = implode(" , ", array_map(fn($attr) => "$attr = :$attr", $rule));
@@ -134,7 +137,7 @@ class Database
             }
 
             $this->pdo->commit();
-            return $sql;
+            return true;
 
         } catch (\Exception $e) {
             return false;

@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__.'/layout/head.php';
+
 use app\lib\Session;
-
-
 
 /* 헤더 레이아웃 */
 require_once __DIR__.'/layout/header.php'

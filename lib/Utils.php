@@ -1,7 +1,5 @@
 <?php
-
 namespace app\lib;
-
 
 class Utils
 {
@@ -12,7 +10,8 @@ class Utils
     }
 
 
-    public function registedValidation($tableName, $rule, $data) {
+    public function registedValidation($tableName, $rule, $data)
+    {
         $reBuildArray = [];
         foreach ($rule as $field => $value) {
             // validation section
@@ -67,7 +66,8 @@ class Utils
     }
 
 
-    private function inputDataReBuild($inputData) {
+    private function inputDataReBuild($inputData)
+    {
         $inputData = trim($inputData);
         $inputData = stripslashes($inputData);
         $inputData = htmlspecialchars($inputData);

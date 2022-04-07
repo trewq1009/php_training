@@ -5,15 +5,11 @@ use app\lib\Imi;
 use app\lib\Session;
 use app\lib\Utils;
 
-
-    $method = (new Utils)->getMethod($_SERVER);
-    if($method == 'post') {
-        $imiModel = new imi();
-        $imiModel->login($_POST);
-    }
-
-
-
+$method = (new Utils)->getMethod($_SERVER);
+if($method == 'post') {
+    $imiModel = new imi();
+    $imiModel->login($_POST);
+}
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';

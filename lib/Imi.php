@@ -1,37 +1,50 @@
 <?php
-
 namespace app\lib;
-
-
 
 class Imi
 {
     public string $id;
+    public array $model;
     protected $db;
     protected $util;
     protected $session;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new Database;
         $this->util = new Utils;
         $this->session = new Session;
     }
 
 
-    private function rule() {
+    private function rule()
+    {
         return [
             'imiId' => 'id',
             'imiPw' => 'pw',
         ];
     }
 
+    private function userRule()
+    {
+        return [
+          'userId' => 'id',
+          'userName' => 'name',
+          'userEmail' => 'email',
+          'userEmailStatus' => 'email_status',
+          'userStatus' => 'status'
+        ];
+    }
 
-    private function getTableName() {
+
+    private function getTableName()
+    {
         return 'tr_account_admin';
     }
 
 
-    public function login($postData) {
+    public function login($postData)
+    {
         $this->id = $postData['imiId'];
 
         foreach ($this->rule() as $key => $value) {
@@ -58,5 +71,36 @@ class Imi
         exit();
     }
 
+
+    public function getUserInfo($getData)
+    {
+        $this->model = $this->db->findOne('tr_account', ['no'], ['no' => $getData['user']]);
+    }
+
+
+    public function userUpdate($postData)
+    {
+        if(!$this->db->update('tr_account', $this->userRule(), ['no' => $postData['userNo']], $postData)) {
+            $this->session->setSession('error', '정보 수정에 실패했습니다.');
+            header('Location: '.$_SERVER['HTTP_REFERER']);
+            exit();
+        }
+        $this->session->setSession('success', '정보 수정에 성공했습니다.');
+        header('Location: /view/imi/user_list.php');
+        exit();
+    }
+
+
+    public function userDelete($postData)
+    {
+        if(!$this->db->update('tr_account', ['status' => 'status'], ['no' => $postData['userNo']], ['status' => 'DEAD'])) {
+            $this->session->setSession('error', '회원 탈퇴에 실패하였습니다.');
+            header('Location: '.$_SERVER['HTTP_REFERER']);
+            exit();
+        }
+        $this->session->setSession('success', '회원 탈퇴에 성공하였습니다.');
+        header('Location: /view/imi/user_list.php');
+        exit();
+    }
 
 }

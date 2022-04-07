@@ -1,5 +1,4 @@
 <?php
-
 namespace app\lib;
 
 class Session
@@ -13,7 +12,8 @@ class Session
     }
 
 
-    public function setSession($sessionName, $sessionValue) {
+    public function setSession($sessionName, $sessionValue)
+    {
         if(!session_id()) {
             session_start();
         }
@@ -24,7 +24,8 @@ class Session
     }
 
 
-    public function removeSession($sessionName) {
+    public function removeSession($sessionName)
+    {
         if(!session_id()) {
             session_start();
         }
@@ -34,7 +35,8 @@ class Session
     }
 
 
-    public static function isSet(string $key) {
+    public static function isSet(string $key)
+    {
         if(!session_id()) {
             session_start();
         }
@@ -42,7 +44,8 @@ class Session
     }
 
 
-    public static function getFlash(string $key) {
+    public static function getFlash(string $key)
+    {
         if(!session_id()) {
             session_start();
         }
