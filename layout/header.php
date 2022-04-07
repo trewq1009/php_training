@@ -22,7 +22,7 @@ use app\lib\Session;
                 <?php if(Session::isSet('auth')): ?>
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">프로필</a>
+                            <a class="nav-link" href="/view/profile.php">프로필</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/view/logout.php">로그아웃</a>

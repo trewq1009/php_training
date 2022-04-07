@@ -3,6 +3,8 @@
 namespace app\lib;
 
 use PDO;
+use PHPMailer\PHPMailer\Exception;
+use DateTime;
 
 require_once '../config/config.php';
 
@@ -43,10 +45,8 @@ class Database
             // query 각각 컬럼명 바인딩 준비
             $params = array_map(fn($attr) => ":$attr", $realName);
 
-
             // 트랜잭션 시작
             $this->pdo->beginTransaction();
-
 
             $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(',', $dbValueName).")
                                     VALUE (".implode(',', $params).")");
@@ -61,7 +61,6 @@ class Database
             if($result > 0) {
                 // 이 구간 에서 검증 한 후에 데이터가 올바르게 들어가면 커밋 명령어 실행
                 $this->pdo->commit();
-
 
                 return true;
             } else {
@@ -93,5 +92,60 @@ class Database
             return false;
         }
     }
+
+
+    public function update($tableName, $rule, $where, $params) {
+        try {
+
+            $sql = implode(" , ", array_map(fn($attr) => "$attr = :$attr", $rule));
+
+            $sql = $sql.", updated = :updated";
+
+            $whereKey = array_keys($where);
+            $sqlWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $whereKey));
+
+            // 트랜잭션 시작
+            $this->pdo->beginTransaction();
+
+            $statement = $this->pdo->prepare("UPDATE $tableName SET $sql WHERE $sqlWhere");
+
+            // value
+            foreach ($rule as $key => $item) {
+                $statement->bindValue(":$item", $params[$key]);
+            }
+
+            // update 날짜
+            $date = new DateTime("NOW");
+            $timeStamp = $date->format('Y-m-d H:i:s');
+            $statement->bindValue(":updated", $timeStamp);
+
+            // where
+            foreach ($where as $whereKey => $whereItem) {
+                $statement->bindValue(":$whereKey", $whereItem);
+            }
+            $statement->execute();
+
+            // sql 문이 성공 했으면 1 반환
+            $result = $statement->rowCount();
+
+            // update 실패시 롤백
+            if($result == 0) {
+                $this->pdo->rollBack();
+                $this->pdo->commit();
+                return false;
+            }
+
+            $this->pdo->commit();
+            return $sql;
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+
+//    public function test($getValue, $tableName, $where) {
+//
+//    }
 
 }

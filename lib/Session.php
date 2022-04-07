@@ -17,9 +17,10 @@ class Session
         if(!session_id()) {
             session_start();
         }
-        if(!isset($_SESSION["$sessionName"])) {
-            $_SESSION["$sessionName"] = $sessionValue;
+        if(isset($_SESSION["$sessionName"])) {
+            $this->removeSession($sessionName);
         }
+        $_SESSION["$sessionName"] = $sessionValue;
     }
 
 
@@ -33,8 +34,7 @@ class Session
     }
 
 
-    public static function isSet(string $key)
-    {
+    public static function isSet(string $key) {
         if(!session_id()) {
             session_start();
         }
