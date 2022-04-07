@@ -142,8 +142,30 @@ class Database
     }
 
 
-//    public function test($getValue, $tableName, $where) {
-//
-//    }
+    public function findAll($tableName, $page)
+    {
+        try {
+            $resultOnPage = 5;                                    // 화면에 보여질 갯수
+            $calcPage = $resultOnPage * (intval($page) - 1);     // 데이터 시작점
+
+            $statement = $this->pdo->prepare("SELECT COUNT(*) AS count FROM $tableName");
+            $statement->execute();
+            $total = $statement->fetch();                           // 데이터 총 갯수
+
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE status = 'ALIVE' OR status = 'AWAIT' ORDER BY no DESC LIMIT $calcPage, $resultOnPage");
+            $statement->execute();
+            $listData = $statement->fetchAll();
+
+            return [
+              'total' => $total['count'],
+              'resultOnPage' => $resultOnPage,
+              'calcPage' =>  $calcPage,
+              'listData' => $listData
+            ];
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 
 }
