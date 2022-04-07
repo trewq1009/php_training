@@ -16,7 +16,7 @@ use app\lib\Session;
                     </li>
                     <?php if(Session::isSet('auth')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Users</a>
+                        <a class="nav-link" href="/view/imi/user_list.php">Users</a>
                     </li>
                     <?php endif; ?>
                 </ul>

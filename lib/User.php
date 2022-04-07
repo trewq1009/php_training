@@ -1,7 +1,5 @@
 <?php
-
 namespace app\lib;
-
 
 class User
 {
