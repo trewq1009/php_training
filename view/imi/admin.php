@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__.'/../../layout/imi/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
 
 use app\lib\Session;
 
 
 /* 헤더 레이아웃 */
-require_once __DIR__.'/../../layout/imi/header.php'
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php'
 ?>
 
 

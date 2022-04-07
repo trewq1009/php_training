@@ -3,10 +3,9 @@
 namespace app\lib;
 
 use PDO;
-use PHPMailer\PHPMailer\Exception;
 use DateTime;
 
-require_once '../config/config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/config/config.php';
 
 class Database
 {
@@ -23,7 +22,6 @@ class Database
             $this->pdo = new \PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
         } catch (\PDOException $e) {
             die($e->getMessage());
-
         } catch (\Exception $e) {
             var_dump($e);
         }

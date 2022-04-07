@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT']. '/vendor/autoload.php';
 
 use app\lib\User;
 use app\lib\Session;
@@ -12,8 +12,8 @@ use app\lib\Session;
 
 
 
-    require_once __DIR__.'/../layout/head.php';
-    require_once __DIR__.'/../layout/header.php';
+    require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
+    require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 ?>
     <section class="container">
         <?php if(Session::isSet('error')): ?>

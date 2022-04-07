@@ -1,5 +1,6 @@
 <?php
 
+
 const APP_SITE = 'http:localhost:8080';
 
 const DB_HOST = 'mysql:host=localhost;port=33066;dbname=training';

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 
 use app\lib\Session;
 
@@ -12,11 +12,11 @@ use app\lib\Session;
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/view/imi/admin.php">Home</a>
                     </li>
                     <?php if(Session::isSet('auth')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Users</a>
+                        <a class="nav-link" href="/">Users</a>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -33,7 +33,7 @@ use app\lib\Session;
                         <a class="nav-link" href="/view/imi/login.php">Login</a>
                     </li>
 <!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link" href="/">회원가입</a>-->
+<!--                        <a class="nav-link" href="/">관리자 등록</a>-->
 <!--                    </li>-->
                 </ul>
                 <?php endif; ?>

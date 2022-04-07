@@ -19,3 +19,23 @@ CREATE UNIQUE INDEX UQ_tr_account_1
     ON tr_account(id, email);
 
 
+
+
+-- tr_account_admin Table Create SQL
+CREATE TABLE tr_account_admin
+(
+    `no`          INT            NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `id`          VARCHAR(45)    NOT NULL    COMMENT '아이디',
+    `pw`          VARCHAR(45)    NOT NULL    COMMENT '패스워드',
+    `name`        VARCHAR(45)    NOT NULL    COMMENT '관리자명',
+    `authority`   INT            NULL        DEFAULT 0 COMMENT '권한(0:최고)',
+    `status`      VARCHAR(45)    NULL        DEFAULT 'ALIVE' COMMENT '계정 상태',
+    `registered`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '등록 일자',
+    `updated`     TIMESTAMP      NULL        COMMENT '업데이트 일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
+
+CREATE UNIQUE INDEX UQ_tr_account_admin_1
+    ON tr_account_admin(id);
