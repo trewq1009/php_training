@@ -3,13 +3,13 @@ namespace app\lib;
 
 class Session
 {
-    public function __construct()
-    {
-        // 세션 아이디가 있다면 아이디 반환 없으면 false 반환
-        if(!session_id()) {
-            session_start();
-        }
-    }
+//    public function __construct()
+//    {
+//        // 세션 아이디가 있다면 아이디 반환 없으면 false 반환
+//        if(!session_id()) {
+//            session_start();
+//        }
+//    }
 
 
     public function setSession($sessionName, $sessionValue)

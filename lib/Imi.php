@@ -80,6 +80,9 @@ class Imi
 
     public function userUpdate($postData)
     {
+        // Validation 작업 요망
+        
+        
         if(!$this->db->update('tr_account', $this->userRule(), ['no' => $postData['userNo']], $postData)) {
             $this->session->setSession('error', '정보 수정에 실패했습니다.');
             header('Location: '.$_SERVER['HTTP_REFERER']);

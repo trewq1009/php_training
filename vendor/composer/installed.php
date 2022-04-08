@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'b58a9debc40496a0372359b73629936e1dc2593d',
+        'reference' => '7f62a9119f45a576032e5098607be7d67bb370a0',
         'name' => 'kimjeongguk/training',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'b58a9debc40496a0372359b73629936e1dc2593d',
+            'reference' => '7f62a9119f45a576032e5098607be7d67bb370a0',
             'dev_requirement' => false,
         ),
         'phpmailer/phpmailer' => array(
