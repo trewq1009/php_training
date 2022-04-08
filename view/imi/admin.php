@@ -1,12 +1,9 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 
 use app\lib\Session;
 
-
-/* 헤더 레이아웃 */
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php'
 ?>
 
 

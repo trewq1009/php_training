@@ -1,5 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 
 use app\lib\Session;
 use app\lib\User;
@@ -20,8 +21,6 @@ if($method === 'post') {
     }
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 ?>
 <section class="container">
     <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">

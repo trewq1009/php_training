@@ -1,8 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
-
-use app\lib\User;
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 
 (new app\lib\User)->logOut();
-
 ?>

@@ -1,5 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 
 use app\lib\Session;
 use app\lib\Utils;
@@ -17,8 +18,6 @@ if($method == 'get') {
     }
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 ?>
 
 <section class="container">

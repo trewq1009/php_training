@@ -1,5 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 
 use app\lib\Imi;
 use app\lib\Session;
@@ -11,8 +12,6 @@ if($method == 'post') {
     $imiModel->login($_POST);
 }
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 ?>
 
 
