@@ -10,33 +10,26 @@ require_once __DIR__.'/../config/config.php';
 class MailSend
 {
     protected string $to_email = '';
-    protected string $from = '';
-    protected string $subject = '';
+    protected string $from = EMAIL_USER;
+    protected string $subject = '회원 가입 이메일';
 
-    public function __construct()
-    {
-        $this->from = EMAIL_USER;
-        $this->subject = '회원 가입 이메일';
-    }
-
-
-    public function sendRegisterEmail($userData)
+    public function sendRegisterEmail($userData): bool
     {
         try {
             $this->to_email = $userData['userEmail'];
             $link = $this->getLink($userData);
             $mail = new PHPMailer(true);
-            $mail -> CharSet = "UTF-8";
+            $mail->CharSet = "UTF-8";
 
             //Server settings
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+//            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
             $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = EMAIL_HOST;                             //Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = EMAIL_USER;                             //SMTP username
-            $mail->Password   = EMAIL_PASSWORD;                         //SMTP password
+            $mail->Host = EMAIL_HOST;                             //Set the SMTP server to send through
+            $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+            $mail->Username = EMAIL_USER;                             //SMTP username
+            $mail->Password = EMAIL_PASSWORD;                         //SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-            $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+            $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             //Recipients
             $mail->setFrom(EMAIL_USER, 'JeongGuk');
@@ -56,7 +49,7 @@ class MailSend
             //Content
             $mail->isHTML(true);                                  //Set email format to HTML
             $mail->Subject = $this->subject;
-            $mail->Body    = "
+            $mail->Body = "
                             <div>
                                 <div>
                                     <h3>회원 가입을 위한 이메일 인증 입니다.</h3>
@@ -68,13 +61,13 @@ class MailSend
                             </div>";
 //            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
+
             $mail->send();
             return true;
         } catch (Exception $e) {
-            return false;
+            return $e->errorMessage();
         }
     }
-
 
     public function getLink($userData)
     {
