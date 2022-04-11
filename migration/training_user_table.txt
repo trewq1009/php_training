@@ -1,6 +1,4 @@
-﻿-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
-
--- tr_account Table Create SQL
+﻿-- tr_account Table Create SQL
 CREATE TABLE tr_account
 (
     `no`            TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
@@ -21,6 +19,28 @@ CREATE UNIQUE INDEX UQ_tr_account_1
     ON tr_account(id, email);
 
 
+-- tr_payment_log Table Create SQL
+CREATE TABLE tr_payment_log
+(
+    `no`                   INT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`              TINYINT      NOT NULL    COMMENT '결재 유저PK',
+    `total_amount`         INT          NOT NULL    COMMENT '결재 금액',
+    `method`               CHAR(10)     NOT NULL    COMMENT '결재 방식',
+    `payment_information`  JSON         NOT NULL    DEFAULT '{}' COMMENT '결제 정보',
+    `status`               CHAR(10)     NOT NULL    COMMENT '결재 상태',
+    `cancels`              JSON         NOT NULL    DEFAULT '{}' COMMENT '취소 정보',
+    `requested_at`         TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '결제일자',
+    `approved_at`          TIMESTAMP    NULL        COMMENT '승인일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_payment_log COMMENT '결재 로그 테이블';
+
+ALTER TABLE tr_payment_log
+    ADD CONSTRAINT FK_tr_payment_log_user_no_tr_account_no FOREIGN KEY (user_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
 -- tr_account_admin Table Create SQL
 CREATE TABLE tr_account_admin
 (
@@ -39,5 +59,30 @@ ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
 
 CREATE UNIQUE INDEX UQ_tr_account_admin_1
     ON tr_account_admin(id, name);
+
+
+-- tr_mileage Table Create SQL
+CREATE TABLE tr_mileage
+(
+    `no`                 TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            TINYINT        NOT NULL    COMMENT '유저 PK',
+    `payment_no`         INT            NULL        COMMENT '결재 로그 PK',
+    `status`             VARCHAR(10)    NOT NULL    COMMENT '행동',
+    `before_mileage`     INT            NOT NULL    DEFAULT 0 COMMENT '이전 소유 마일리지',
+    `use_mileage`        INT            NOT NULL    DEFAULT 0 COMMENT '변동 마일리지',
+    `total_mileage`      INT            NOT NULL    DEFAULT 0 COMMENT '총 소유 마일리지',
+    `registration_date`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '등록일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_mileage COMMENT '마일리지 테이블';
+
+ALTER TABLE tr_mileage
+    ADD CONSTRAINT FK_tr_mileage_payment_no_tr_payment_log_no FOREIGN KEY (payment_no)
+        REFERENCES tr_payment_log (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_mileage
+    ADD CONSTRAINT FK_tr_mileage_user_no_tr_account_no FOREIGN KEY (user_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 

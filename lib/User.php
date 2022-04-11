@@ -14,7 +14,7 @@ class User
     {
         return [
             'userId' => 'id',
-            'userPw' => 'pw',
+            'userPw' => 'password',
             'userEmail' => 'email',
             'userName' => 'name'
         ];
@@ -33,14 +33,13 @@ class User
                 $inputData = trim($value);
                 $inputData = stripslashes($inputData);
                 $inputData = htmlspecialchars($inputData);
-
                 if($key == 'userId') {
                     // pattern 체크
                     if (!preg_match("/^[a-zA-Z0-9-' ]*$/", $inputData)) {
                         throw new Exception('아이디 형태가 올바르지 않습니다.');
                     }
                     // DB 중복 확인
-                    if ((new Database)->findOne('tr_account', ['userId'], $inputData)) {
+                    if ((new Database)->findOne('tr_account', ['id'], ['id' => $inputData])) {
                         throw new Exception('중복된 아이디 입니다.');
                     }
                 } else if($key == 'userPw') {
@@ -50,7 +49,7 @@ class User
                     $inputData = password_hash($inputData, PASSWORD_BCRYPT);
 
                 } else if($key == 'userPwC') {
-                    if(!$postData['userPw'] === $postData['userPwC']) {
+                    if(!$postData['userPw'] == $postData['userPwC']) {
                         throw new Exception('패스워드가 일치 하지 않습니다.');
                     }
                 } else if($key == 'userName') {
@@ -70,23 +69,24 @@ class User
             }
 
             // DB 연결 시작 & 트렌 시작
-            $db = new Database;
-            $db->pdo->beginTransaction();
+//            $db = new Database;
+//            $db->pdo->beginTransaction();
 
-            if(!$db->save('tr_account', $this->rule(), $rebuildData)) {
-                throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
-            }
+//            if(!$db->save('tr_account', $this->rule(), $rebuildData)) {
+//                throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
+//            }
 
-            if(!(new MailSend)->sendRegisterEmail($rebuildData)) {
-                throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
-            }
+//            if(!(new MailSend)->sendRegisterEmail($postData)) {
+//                throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
+//            }
 
-            (new Session)->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
-            header('Location: /');
-            exit();
+
+//            (new Session)->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
+//            header('Location: /');
+//            exit();
 
         } catch (CustomException $e) {
-            (new Database)->pdo->rollBack();
+//            (new Database)->pdo->rollBack();
             $e->setErrorMessage($e->getMessage());
             header('Location: /');
         } catch (Exception $e) {
@@ -109,7 +109,7 @@ class User
             }
 
             // Password 확인
-            if(!password_verify($postData['userPw'], $userData['pw'])) {
+            if(!password_verify($postData['userPw'], $userData['password'])) {
                 throw new CustomException('패스워드가 일치하지 않습니다.');
             }
 
@@ -142,7 +142,7 @@ class User
         try {
             $session = new Session;
             if(empty($updateData['userPw'])) {
-                $updateData['userPw'] = $session->isSet('auth')['pw'];
+                $updateData['userPw'] = $session->isSet('auth')['password'];
             } else {
                 if(strlen($updateData['userPw']) < 8 || strlen($updateData['userPw']) > 20) {
                     throw new Exception('비밀번호 형식에 맞지 않습니다.');
