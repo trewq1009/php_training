@@ -13,14 +13,14 @@ use app\lib\Session;
                     <li class="nav-item">
                         <a class="nav-link" href="/view/imi/admin.php">Home</a>
                     </li>
-                    <?php if(Session::isSet('auth')): ?>
+                    <?php if((new Session)->isSet('auth')): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="/view/imi/user_list.php">Users</a>
                     </li>
                     <?php endif; ?>
                 </ul>
 
-                <?php if(Session::isSet('auth')): ?>
+                <?php if((new Session)->isSet('auth')): ?>
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link" href="/view/logout.php">로그아웃</a>

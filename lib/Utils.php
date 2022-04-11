@@ -3,13 +3,6 @@ namespace app\lib;
 
 class Utils
 {
-
-    public function getMethod(array $server): string
-    {
-        return strtolower($server['REQUEST_METHOD']);
-    }
-
-
     public function registedValidation($tableName, $rule, $data)
     {
         $reBuildArray = [];

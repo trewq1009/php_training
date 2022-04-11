@@ -3,12 +3,10 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 
 use app\lib\Session;
-use app\lib\Utils;
 use app\lib\Imi;
 
-$method = (new Utils)->getMethod($_SERVER);
 $model = new Imi;
-if($method == 'get') {
+if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
     $model->getUserInfo($_GET);
 } else {
     if($_POST['action'] == 'update') {
@@ -22,9 +20,9 @@ if($method == 'get') {
 
 <section class="container">
 
-    <?php if(Session::isSet('error')): ?>
+    <?php if((new Session)->isSet('error')): ?>
         <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
+            <?php echo (new Session)->getFlash('error') ?>
         </div>
     <?php endif; ?>
 

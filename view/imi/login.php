@@ -4,10 +4,8 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 
 use app\lib\Imi;
 use app\lib\Session;
-use app\lib\Utils;
 
-$method = (new Utils)->getMethod($_SERVER);
-if($method == 'post') {
+if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     $imiModel = new imi();
     $imiModel->login($_POST);
 }
@@ -17,9 +15,9 @@ if($method == 'post') {
 
 
     <section class="container">
-        <?php if(Session::isSet('error')): ?>
+        <?php if((new Session)->isSet('error')): ?>
             <div class="alert alert-danger">
-                <?php echo Session::getFlash('error') ?>
+                <?php echo (new Session)->getFlash('error') ?>
             </div>
         <?php endif; ?>
 

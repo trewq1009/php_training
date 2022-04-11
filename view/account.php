@@ -4,9 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 
 use app\lib\User;
 
-$method = (new app\lib\Utils)->getMethod($_SERVER);
-
-if($method == 'get') {
+if(strtolower($_SERVER['REQUEST_METHOD']) == 'get')  {
     (new User)->emailAuthentication($_GET);
 }
 

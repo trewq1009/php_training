@@ -5,17 +5,16 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 use app\lib\User;
 use app\lib\Session;
 
-$method = (new app\lib\Utils)->getMethod($_SERVER);
-if($method === 'post') {
+if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     $userModel = new User();
     $userModel->register($_POST);
 }
 
 ?>
     <section class="container">
-        <?php if(Session::isSet('error')): ?>
+        <?php if((new Session)->isSet('error')): ?>
             <div class="alert alert-danger">
-                <?php echo Session::getFlash('error') ?>
+                <?php echo (new Session)->getFlash('error') ?>
             </div>
         <?php endif; ?>
 

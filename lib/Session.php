@@ -35,7 +35,7 @@ class Session
     }
 
 
-    public static function isSet(string $key)
+    public function isSet(string $key)
     {
         if(!session_id()) {
             session_start();
@@ -44,7 +44,7 @@ class Session
     }
 
 
-    public static function getFlash(string $key)
+    public function getFlash(string $key)
     {
         if(!session_id()) {
             session_start();

@@ -18,7 +18,7 @@ use app\lib\Session;
                     </li>
                 </ul>
 
-                <?php if(Session::isSet('auth')): ?>
+                <?php if((new Session)->isSet('auth')): ?>
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link" href="/view/profile.php">프로필</a>
