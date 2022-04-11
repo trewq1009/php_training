@@ -1,6 +1,7 @@
 <?php
 namespace app\lib;
 
+use app\lib\exception\CustomException;
 use Exception;
 
 class User
@@ -46,11 +47,18 @@ class User
                     if(strlen($inputData) < 8 || strlen($inputData) > 20) {
                         throw new Exception('비밀번호 형식에 맞지 않습니다.');
                     }
+                    $inputData = password_hash($inputData, PASSWORD_BCRYPT);
+
                 } else if($key == 'userPwC') {
                     if(!$postData['userPw'] === $postData['userPwC']) {
                         throw new Exception('패스워드가 일치 하지 않습니다.');
                     }
+                } else if($key == 'userName') {
+                    if (!preg_match("/^[가-힣]{9,}$/", $inputData)) {
+                        throw new Exception('올바른 이름의 형태가 아닙니다.');
+                    }
                 } else if($key == 'userEmail') {
+
                     if(!filter_var($inputData, FILTER_VALIDATE_EMAIL)) {
                         throw new Exception('이메일 형식에 맞지 않습니다.');
                     }
@@ -58,7 +66,7 @@ class User
                         throw new Exception('중복된 이메일 입니다.');
                     }
                 }
-                $rebuildData[$key] = $value;
+                $rebuildData[$key] = $inputData;
             }
 
             // DB 연결 시작 & 트렌 시작

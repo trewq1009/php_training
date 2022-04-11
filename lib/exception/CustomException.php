@@ -1,5 +1,7 @@
 <?php
-namespace app\lib;
+namespace app\lib\exception;
+
+use app\lib\Session;
 
 class CustomException extends \Exception
 {
