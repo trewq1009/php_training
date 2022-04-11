@@ -5,15 +5,13 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
 use app\lib\Imi;
 use app\lib\Session;
 
+$imiId = '';
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    $imiModel = new imi();
-    $imiModel->login($_POST);
+    $imiId = $_POST['imiId'];
+    (new Imi)->login($_POST);
 }
 
 ?>
-
-
-
     <section class="container">
         <?php if((new Session)->isSet('error')): ?>
             <div class="alert alert-danger">
@@ -24,7 +22,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
             <div class="mb-3">
                 <label for="imiId" class="form-label">ID</label>
-                <input type="text" class="form-control" value="<?php echo $imiModel->id; ?>" name="imiId" id="imiId" required>
+                <input type="text" class="form-control" value="<?php echo $imiId; ?>" name="imiId" id="imiId" required>
             </div>
             <div class="mb-3">
                 <label for="imiPassword" class="form-label">Password</label>

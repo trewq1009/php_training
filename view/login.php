@@ -5,9 +5,10 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 use app\lib\User;
 use app\lib\Session;
 
+$userId = '';
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    $userModel = new User();
-    $userModel->logIn($_POST);
+    $userId = $_POST['userId'];
+    (new User)->logIn($_POST);
 }
 
 ?>
@@ -22,7 +23,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
         <div class="mb-3">
             <label for="userId" class="form-label">ID</label>
-            <input type="text" class="form-control" value="<?php echo $userModel->userId ?>" name="userId" id="userId" required>
+            <input type="text" class="form-control" value="<?php echo $userId ?>" name="userId" id="userId" required>
         </div>
         <div class="mb-3">
             <label for="userPassword" class="form-label">Password</label>

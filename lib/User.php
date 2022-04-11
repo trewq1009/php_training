@@ -1,26 +1,10 @@
 <?php
 namespace app\lib;
 
+use Exception;
+
 class User
 {
-    public string $userId = '';
-    public string $userName = '';
-    public string $userEmail = '';
-    protected $db;
-    protected $util;
-    protected $session;
-    protected $mail;
-
-
-    public function __construct()
-    {
-        $this->db = new Database;
-        $this->util = new Utils;
-        $this->session = new Session;
-        $this->mail = new MailSend;
-    }
-
-
     /**
      * @return string[]
      * [InputName => DB TableName]
@@ -36,75 +20,110 @@ class User
     }
 
 
-    private function getTableName()
-    {
-        return 'tr_account';
-    }
-
-
     public function register($postData)
     {
-        $this->userId = $postData['userId'];
-        $this->userName = $postData['userName'];
-        $this->userEmail = $postData['userEmail'];
+        try {
+            // 가입을 위한 Validation 작업
+            if (empty($postData['userId']) || empty($postData['userName']) || empty($postData['userPw']) || empty($postData['userPwC']) || empty($postData['userEmail'])) {
+                throw new Exception('필수 정보를 기입해 주세요');
+            }
+            $rebuildData = [];
+            foreach ($postData as $key => $value) {
+                $inputData = trim($value);
+                $inputData = stripslashes($inputData);
+                $inputData = htmlspecialchars($inputData);
 
-        // 가입을 위한 Validation 작업
-        $userData = $this->util->registedValidation($this->getTableName(), $this->rule(), $postData);
-        if(count($userData) <= 1) {
-            $this->session->setSession('error', $userData['error']);
-            return;
-        }
+                if($key == 'userId') {
+                    // pattern 체크
+                    if (!preg_match("/^[a-zA-Z0-9-' ]*$/", $inputData)) {
+                        throw new Exception('아이디 형태가 올바르지 않습니다.');
+                    }
+                    // DB 중복 확인
+                    if ((new Database)->findOne('tr_account', ['userId'], $inputData)) {
+                        throw new Exception('중복된 아이디 입니다.');
+                    }
+                } else if($key == 'userPw') {
+                    if(strlen($inputData) < 8 || strlen($inputData) > 20) {
+                        throw new Exception('비밀번호 형식에 맞지 않습니다.');
+                    }
+                } else if($key == 'userPwC') {
+                    if(!$postData['userPw'] === $postData['userPwC']) {
+                        throw new Exception('패스워드가 일치 하지 않습니다.');
+                    }
+                } else if($key == 'userEmail') {
+                    if(!filter_var($inputData, FILTER_VALIDATE_EMAIL)) {
+                        throw new Exception('이메일 형식에 맞지 않습니다.');
+                    }
+                    if ((new Database)->findOne('tr_account', ['email'], ['email' => $inputData])) {
+                        throw new Exception('중복된 이메일 입니다.');
+                    }
+                }
+                $rebuildData[$key] = $value;
+            }
 
-        // DB 연결 & 저장
-        if(!$this->db->save($this->getTableName(), $this->rule(), $userData)) {
-            $this->session->setSession('error', '회원가입에 실패 하였습니다. 다시 시도해 주세요.');
-            return;
-        }
+            // DB 연결 시작 & 트렌 시작
+            $db = new Database;
+            $db->pdo->beginTransaction();
 
-        // 성공 하면 이메일 인증 함수 실행
-        // 그리고 메인 화면 리다이렉트 하며 메시지 전송?
+            if(!$db->save('tr_account', $this->rule(), $rebuildData)) {
+                throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
+            }
 
-        if(!$this->mail->sendRegisterEmail($userData)) {
-            $this->session->setSession('error', '이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
+            if(!(new MailSend)->sendRegisterEmail($rebuildData)) {
+                throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
+            }
+
+            (new Session)->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
             header('Location: /');
             exit();
-        }
 
-        $this->session->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
-        header('Location: /');
-        exit();
+        } catch (CustomException $e) {
+            (new Database)->pdo->rollBack();
+            $e->setErrorMessage($e->getMessage());
+            header('Location: /');
+        } catch (Exception $e) {
+            (new Session)->setSession('error', $e->getMessage());
+        }
     }
 
 
     public function logIn($postData)
     {
-        $this->userId = $postData['userId'];
+        try {
+            if(empty($postData['userId']) || empty($postData['userPw'])) {
+                throw new CustomException('정보를 입력해 주세요.');
+            }
 
-        $userData = $this->db->findOne($this->getTableName(), ['id', 'status'], ['id' => $this->userId, 'status' => 'ALIVE']);
-        if(!$userData) {
-            $this->session->setSession('error', '계정을 다시 확인 해주세요.');
-            return;
-        }
-        // 비밀번호 인증
-        if(!password_verify($postData['userPw'], $userData['pw'])) {
-            $this->session->setSession('error', '비밀번호가 일치하지 않습니다.');
-            return;
-        }
-        // Email 미 인증 유저 Validation
-        if($userData['email_status'] == 'INACTIVE') {
-            $this->session->setSession('error', '이메일 인증을 완료하지 않았습니다. 메일 인증을 해주세요.');
-            return;
-        }
+            // DB 계정 확인
+            $userData = (new Database)->findOne('tr_account', ['id', 'status'], ['id' => $postData['userId'], 'status' => 'ALIVE']);
+            if(!$userData) {
+                throw new CustomException('계정을 다시 확인 해주세요.');
+            }
 
-        $this->session->setSession('auth', $userData);
-        header('Location: /');
-        exit();
+            // Password 확인
+            if(!password_verify($postData['userPw'], $userData['pw'])) {
+                throw new CustomException('패스워드가 일치하지 않습니다.');
+            }
+
+            // Email 미 인증 유저
+            if($userData['email_status'] == 'INACTIVE') {
+                throw new CustomException('이메일 인증을 완료하지 않았습니다.');
+            }
+
+            // 로그인
+            (new Session)->setSession('auth', $userData);
+            header('Location: /');
+            exit();
+
+        } catch (CustomException $e) {
+            $e->setErrorMessage($e->getMessage());
+        }
     }
 
 
     public function logOut()
     {
-        $this->session->removeSession('auth');
+        (new Session)->removeSession('auth');
         header('Location: /');
         exit();
     }
@@ -112,79 +131,102 @@ class User
 
     public function update($updateData)
     {
-        // 로그인 중인가 다시 검증
-        if(!$this->session->isSet('auth')) {
-            $this->session->setSession('error', '로그인이 해제되었습니다.');
+        try {
+            $session = new Session;
+            if(empty($updateData['userPw'])) {
+                $updateData['userPw'] = $session->isSet('auth')['pw'];
+            } else {
+                if(strlen($updateData['userPw']) < 8 || strlen($updateData['userPw']) > 20) {
+                    throw new Exception('비밀번호 형식에 맞지 않습니다.');
+                }
+                $updateData['userPw'] = password_hash($updateData['userPw'], PASSWORD_BCRYPT);
+            }
+
+            // DB connect
+            $db = new Database;
+            $db->pdo->beginTransaction();
+
+            if(!$db->update('tr_account', $this->rule(), ['no' => $_SESSION['auth']['no']], $updateData)) {
+                throw new CustomException('정보 수정에 실패했습니다.');
+            }
+            $db->pdo->commit();
+
+            $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
+            (new Session)->setSession('auth', $afterUserData);
+            (new Session)->setSession('success', '정보 수정이 완료 되었습니다.');
             header('Location: /');
             exit();
+
+        } catch (CustomException $e) {
+            (new Database)->pdo->rollBack();
+            $e->setErrorMessage($e->getMessage());
+
+        } catch (Exception $e) {
+            (new Session)->setSession('error', $e->getMessage());
         }
-
-        // 비밀번호 변경 안하면
-        if(empty($updateData['userPw'])) {
-            $updateData['userPw'] = $this->session->isSet('auth')['pw'];
-        } else {
-            $updateData['userPw'] = password_hash($updateData['userPw'], PASSWORD_BCRYPT);
-        }
-        
-        // Validation 작업 추가 해야함
-        // 재사용 할 수 있도록 로직 생각 해야함
-
-
-
-        // update 성공하면 true 반환
-        if(!$this->db->update($this->getTableName(), $this->rule(), ['no' => $_SESSION['auth']['no']],$updateData)) {
-            $this->session->setSession('error', '정보 수정에 실패하였습니다.');
-            header('Location: /');
-            exit();
-        }
-
-        $updateUserData = $this->db->findOne($this->getTableName(), ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
-        $this->session->setSession('auth', $updateUserData);
-        $this->session->setSession('success', '정보 수정 완료 되었습니다.');
-        header('Location: /');
-        exit();
     }
 
 
     public function delete($deleteData)
     {
-        // update 성공하면 true 반환
-        if(!$this->db->update($this->getTableName(), ['status' => 'status'], ['no' => $deleteData['no']], ['status' => 'AWAIT'])) {
-            $this->session->setSession('error', '회원 탈퇴 신청이 실패 했습니다.');
+        try {
+            $db = new Database;
+            $db->pdo->beginTransaction();
+
+            if(!$db->update('tr_account', ['status' => 'status'], ['no' => $deleteData['no']], ['status' => 'AWAIT'])) {
+                throw new CustomException('회원 탈퇴 신청을 실패하였습니다.');
+            }
+
+            $db->pdo->commit();
+            $session = new Session;
+
+            $session->setSession('success', '회원 탈퇴 신청이 완료 되었습니다.');
+            $session->removeSession('auth');
             header('Location: /');
             exit();
+
+        } catch (CustomException $e) {
+            (new Database)->pdo->rollBack();
+            $e->setErrorMessage($e->getMessage());
         }
-        $this->session->setSession('success', '회원 탈퇴 신청이 완료 되었습니다.');
-        $this->session->removeSession('auth');
-        header('Location: /');
-        exit();
     }
 
 
     // 이메일 인증
     public function emailAuthentication($getData)
     {
-        if(!isset($getData['training'])) {
-            $this->session->setSession('error', 'URL 이 올바르지 않습니다.');
-            header('Location: /');
-            exit();
-        }
+        try {
+            if(!isset($getData['training'])) {
+                throw new Exception('올바른 주소가 아닙니다.');
+            }
 
-        $userData = $this->db->findOne($this->getTableName(), ['id', 'status'], ['id' => $getData['training'], 'status' => 'ALIVE']);
-        if(!$userData) {
-            $this->session->setSession('error', '올바른 회원이 아닙니다.');
-            header('Location: /');
-            exit();
-        }
+            $db = new Database;
+            $db->pdo->beginTransaction();
 
-        if(!$this->db->update($this->getTableName(), ['email_status' => 'email_status'], ['id' => $userData['id']], ['email_status' => 'ACTIVE'])) {
-            $this->session->setSession('error', '인증에 문제가 발생했습니다. 관리자에게 문의 주세요.');
+            $userData = $db->findOne('tr_account', ['id', 'status'], ['id' => $getData['training'], 'status' => 'ALIVE']);
+            if(!$userData) {
+                throw new Exception('올바른 회원이 아닙니다.');
+            }
+
+            if(!$db->update('tr_account', ['email_status' => 'email_status'], ['id' => $userData['id']], ['email_status' => 'ACTIVE'])) {
+                throw new CustomException('인증에 문제가 발생했습니다. 관리자에게 문의 주세요');
+            }
+
+            $db->pdo->commit();
+            (new Session)->setSession('success', '이메일 인증이 완료 되었습니다. 로그인 해주세요.');
+            header('Location: /');
+            exit();
+
+        } catch (CustomException $e) {
+            (new Database)->pdo->rollBack();
+            $e->setErrorMessage($e->getMessage());
+            header('Location: /');
+            exit();
+        } catch (Exception $e) {
+            (new Session)->setSession('error', $e->getMessage());
             header('Location: /');
             exit();
         }
-        $this->session->setSession('success', '이메일 인증이 완료 되었습니다. 로그인 해주세요.');
-        header('Location: /');
-        exit();
     }
 
 }

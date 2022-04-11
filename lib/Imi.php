@@ -1,30 +1,10 @@
 <?php
 namespace app\lib;
 
+use Exception;
+
 class Imi
 {
-    public string $id;
-    public array $model;
-    protected $db;
-    protected $util;
-    protected $session;
-
-    public function __construct()
-    {
-        $this->db = new Database;
-        $this->util = new Utils;
-        $this->session = new Session;
-    }
-
-
-    private function rule()
-    {
-        return [
-            'imiId' => 'id',
-            'imiPw' => 'pw',
-        ];
-    }
-
     private function userRule()
     {
         return [
@@ -36,45 +16,35 @@ class Imi
         ];
     }
 
-
-    private function getTableName()
-    {
-        return 'tr_account_admin';
-    }
-
-
     public function login($postData)
     {
-        $this->id = $postData['imiId'];
-
-        foreach ($this->rule() as $key => $value) {
-            if(empty($postData[$key])) {
-                $this->session->setSession('error', "$value 를 입력해 주세요");
-                return;
+        try {
+            if(empty($postData['imiId']) || empty($postData['imiPw'])) {
+                throw new Exception('입력값을 확인 해주세요.');
             }
-        }
 
-        $userData = $this->db->findOne($this->getTableName(), ['id', 'status'], ['id' => $this->id, 'status' => 'ALIVE']);
-        if(!$userData) {
-            $this->session->setSession('error', '계정을 다시 확인 해주세요.');
-            return;
-        }
+            $userData = (new Database)->findOne('tr_account_admin', ['id', 'status'], ['id' => $postData['imiId'], 'status' => 'ALIVE']);
+            if(!$userData) {
+                throw new Exception('계정을 다시 확인 해주세요.');
+            }
 
-        // 비밀번호 인증
-        if(!password_verify($postData['imiPw'], $userData['pw'])) {
-            $this->session->setSession('error', '비밀번호가 일치하지 않습니다.');
-            return;
-        }
+            if(!password_verify($postData['imiPw'], $userData['pw'])) {
+                throw new Exception('패스워드를 다시 확인 해주세요.');
+            }
 
-        $this->session->setSession('auth', $userData);
-        header('Location: /view/imi/admin.php');
-        exit();
+            (new Session)->setSession('auth', $userData);
+            header('Location: /view/imi/admin.php');
+            exit();
+
+        } catch (Exception $e) {
+            (new Session)->setSession('error', $e->getMessage());
+        }
     }
 
 
     public function getUserInfo($getData)
     {
-        $this->model = $this->db->findOne('tr_account', ['no'], ['no' => $getData['user']]);
+        $this->model = (new Database)->findOne('tr_account', ['no'], ['no' => $getData['user']]);
     }
 
 
@@ -83,7 +53,7 @@ class Imi
         // Validation 작업 요망
         
         
-        if(!$this->db->update('tr_account', $this->userRule(), ['no' => $postData['userNo']], $postData)) {
+        if(!(new Database)->update('tr_account', $this->userRule(), ['no' => $postData['userNo']], $postData)) {
             $this->session->setSession('error', '정보 수정에 실패했습니다.');
             header('Location: '.$_SERVER['HTTP_REFERER']);
             exit();
@@ -96,7 +66,7 @@ class Imi
 
     public function userDelete($postData)
     {
-        if(!$this->db->update('tr_account', ['status' => 'status'], ['no' => $postData['userNo']], ['status' => 'DEAD'])) {
+        if(!(new Database)->update('tr_account', ['status' => 'status'], ['no' => $postData['userNo']], ['status' => 'DEAD'])) {
             $this->session->setSession('error', '회원 탈퇴에 실패하였습니다.');
             header('Location: '.$_SERVER['HTTP_REFERER']);
             exit();

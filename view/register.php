@@ -2,12 +2,18 @@
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 
-use app\lib\User;
 use app\lib\Session;
+use app\lib\User;
+
+$userId = '';
+$userName = '';
+$userEmail = '';
 
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    $userModel = new User();
-    $userModel->register($_POST);
+    $userId = $_POST['userId'];
+    $userName = $_POST['userName'];
+    $userEmail = $_POST['userEmail'];
+    (new User)->register($_POST);
 }
 
 ?>
@@ -22,11 +28,11 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
             <div class="mb-3">
                 <label for="userId" class="form-label">ID</label>
-                <input type="text" class="form-control" value="<?php echo $userModel->userId ?? '' ?>" name="userId" id="userId" required>
+                <input type="text" class="form-control" value="<?php echo $userId ?>" name="userId" id="userId" required>
             </div>
             <div class="mb-3">
                 <label for="userName" class="form-label">Name</label>
-                <input type="text" class="form-control" value="<?php echo $userModel->userName ?? '' ?>" name="userName" id="userName" required>
+                <input type="text" class="form-control" value="<?php echo $userName ?>" name="userName" id="userName" required>
             </div>
             <div class="mb-3">
                 <label for="userPassword" class="form-label">Password</label>
@@ -38,7 +44,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
             </div>
             <div class="mb-3">
                 <label for="userEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" value="<?php echo $userModel->userEmail ?? '' ?>" name="userEmail" id="userEmail" required>
+                <input type="email" class="form-control" value="<?php echo $userEmail ?>" name="userEmail" id="userEmail" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

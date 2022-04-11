@@ -11,7 +11,7 @@ const DB_PASSWORD = 'kjk100(';
 //const DB_USER = 'admin';
 //const DB_PASSWORD = 'Rhksflwk1!';
 
-
+// Email
 const EMAIL_HOST = 'smtp.gmail.com';
 const EMAIL_USER = 'trewq1009@gmail.com';
 const EMAIL_PASSWORD = 'trewq951009';

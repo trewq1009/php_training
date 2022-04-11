@@ -1,6 +1,7 @@
 <?php
 namespace app\lib;
 
+use Exception;
 use PDO;
 use DateTime;
 
@@ -20,10 +21,8 @@ class Database
             $password = DB_PASSWORD;
 
             $this->pdo = new \PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
-        } catch (\PDOException $e) {
+        } catch (\PDOException | Exception $e) {
             die($e->getMessage());
-        } catch (\Exception $e) {
-            var_dump($e);
         }
     }
 
@@ -43,30 +42,24 @@ class Database
             // try catch 문도 적절히 사용할 것
             // query 각각 컬럼명 바인딩 준비
             $params = array_map(fn($attr) => ":$attr", $realName);
-
-            // 트랜잭션 시작
-            $this->pdo->beginTransaction();
-
-            $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(',', $dbValueName).")
-                                    VALUE (".implode(',', $params).")");
+            
+            $statement = $this->pdo->prepare("INSERT INTO $tableName (" . implode(',', $dbValueName) . ")
+                                    VALUE (" . implode(',', $params) . ")");
             foreach ($realName as $item) {
                 $statement->bindValue(":$item", $data[$item]);
             }
             $statement->execute();
-            
+
             // sql 문이 성공 했으면 1 반환
             $result = $statement->rowCount();
 
-            if($result > 0) {
-                // 이 구간 에서 검증 한 후에 데이터가 올바르게 들어가면 커밋 명령어 실행
-                $this->pdo->commit();
-
-                return true;
-            } else {
-                $this->pdo->rollBack();
-                $this->pdo->commit();
-                return false;
+            if ($result == 0) {
+                throw new Exception();
             }
+
+            $this->pdo->commit();
+            return true;
+
         } catch (\Exception $e) {
             $this->pdo->rollBack();
             return false;
@@ -88,7 +81,7 @@ class Database
             $statement->execute();
             return $statement->fetch();
             
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -104,9 +97,6 @@ class Database
 
             $whereKey = array_keys($where);
             $sqlWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $whereKey));
-
-            // 트랜잭션 시작
-            $this->pdo->beginTransaction();
 
             $statement = $this->pdo->prepare("UPDATE $tableName SET $sql WHERE $sqlWhere");
 
@@ -131,21 +121,17 @@ class Database
 
             // update 실패시 롤백
             if($result == 0) {
-                $this->pdo->rollBack();
-                $this->pdo->commit();
-                return false;
+                throw new Exception();
             }
 
-            $this->pdo->commit();
             return true;
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
 
-    public function findAll($tableName, $page)
+    public function list($tableName, $page)
     {
         try {
             $resultOnPage = 5;                                    // 화면에 보여질 갯수

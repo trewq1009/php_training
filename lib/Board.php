@@ -37,7 +37,7 @@ class Board
         $url = explode('/', $url);
         $this->url = end($url);
 
-        $resultArr = $this->db->findAll($this->rule()[$this->url], $this->page);
+        $resultArr = $this->db->list($this->rule()[$this->url], $this->page);
 
         // page list
         $this->listHtml = $this->field->userList($resultArr['listData']);

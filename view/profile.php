@@ -5,14 +5,15 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 use app\lib\Session;
 use app\lib\User;
 
+$userModel = (new Session)->isSet('auth');
+
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     if($_POST['action'] === 'update') {
         (new User)->update($_POST);
     } else {
-        (new User)->delete(Session::isSet('auth'));
+        (new User)->delete($userModel);
     }
 } else {
-    $userModel = (new Session)->isSet('auth');
     if(!$userModel) {
         (new Session)->setSession('error', '잘못된 경로 입니다.');
         header('Location: /');
@@ -22,6 +23,13 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
 
 ?>
 <section class="container">
+
+    <?php if((new Session)->isSet('error')): ?>
+        <div class="alert alert-danger">
+            <?php echo (new Session)->getFlash('error') ?>
+        </div>
+    <?php endif; ?>
+
     <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
         <div class="mb-3">
             <label for="userId" class="form-label">ID</label>
