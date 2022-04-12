@@ -18,16 +18,14 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
     $paymentModel = $_POST;
     (new Payment)->cardPayment($_POST);
 }
-
 ?>
 
 <?php if($paymentModel['radioValue'] == 'credit'): ?>
 <section class="container">
     <h1>카드 결재</h1>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" id="methodForm">
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
-        <input type="hidden" value="<?php echo $preUrl ?>" name="preUrl">
 
         <div class="mb-3">
             <label for="cardNumber1" class="form-label">Card Number</label>
@@ -39,19 +37,19 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
             </div>
         </div>
         <div class="mb-3">
-            <label for="cardYear" class="form-label">Valid Month/Year</label>
+            <label for="cardMonth" class="form-label">Valid Month/Year</label>
             <div style="display: flex;">
-                <input type="text" class="form-control" name="cardYear" id="cardYear" maxlength="2">
-                <input type="text" class="form-control" name="cardMonth" id="cardMonth" maxlength="2">
+                <input type="text" class="form-control" name="cardMonth" id="cardMonth" maxlength="2" required>
+                <input type="text" class="form-control" name="cardYear" id="cardYear" maxlength="2" required>
             </div>
         </div>
         <div class="mb-3">
             <label for="cardCVC" class="form-label">CVC</label>
-            <input type="password" class="form-control" name="cardCVC" id="cardCVC" maxlength="3" >
+            <input type="password" class="form-control" name="cardCVC" id="cardCVC" maxlength="3" required>
         </div>
         <div class="mb-3">
             <label for="cardPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" name="cardPassword" id="cardPassword" maxlength="4" >
+            <input type="password" class="form-control" name="cardPassword" id="cardPassword" maxlength="4" required>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

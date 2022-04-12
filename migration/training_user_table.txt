@@ -29,9 +29,9 @@ CREATE TABLE tr_payment_log
     `user_no`              TINYINT      NOT NULL    COMMENT '결재 유저PK',
     `total_amount`         INT          NOT NULL    COMMENT '결재 금액',
     `method`               CHAR(10)     NOT NULL    COMMENT '결재 방식',
-    `payment_information`  JSON         NOT NULL    COMMENT '결제 정보',
+    `payment_information`  TEXT         NOT NULL    COMMENT '결제 정보',
     `status`               CHAR(10)     NOT NULL    COMMENT '결재 상태',
-    `cancels`              JSON         NOT NULL    COMMENT '취소 정보',
+    `cancels`              TEXT         NOT NULL    COMMENT '취소 정보',
     `requested_at`         TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '결제일자',
     `approved_at`          TIMESTAMP    NULL        COMMENT '승인일자',
      PRIMARY KEY (no)

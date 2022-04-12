@@ -121,7 +121,7 @@ class Database
             if($result == 0) {
                 throw new Exception();
             }
-
+            
             return true;
         } catch (Exception $e) {
             return false;

@@ -89,7 +89,7 @@ class User
             }
 
             // 회원 마일리지 테이블 작성
-            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'status'=>'status'], ['user_no' => $userNo, 'status'=>'회원가입'])) {
+            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'status'=>'status'], ['user_no' => $userNo, 'status'=>'Join'])) {
                 throw new CustomException('회원 마일리지 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
             }
 
@@ -106,7 +106,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessage($e->getMessage());
+            $e->setErrorMessages($e->getMessage());
         } catch (Exception $e) {
             (new Session)->setSession('error', $e->getMessage());
         }
@@ -142,7 +142,7 @@ class User
             exit();
 
         } catch (CustomException $e) {
-            $e->setErrorMessage($e->getMessage());
+            $e->setErrorMessages($e->getMessage());
         }
     }
 
@@ -185,7 +185,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessage($e->getMessage());
+            $e->setErrorMessages($e->getMessage());
 
         } catch (Exception $e) {
             $session->setSession('error', $e->getMessage());
@@ -213,7 +213,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessage($e->getMessage());
+            $e->setErrorMessages($e->getMessage());
         }
     }
 
@@ -245,7 +245,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessage($e->getMessage());
+            $e->setErrorMessages($e->getMessage());
             header('Location: /');
             exit();
         } catch (Exception $e) {

@@ -6,7 +6,7 @@ use app\lib\Session;
 
 class InputDataNullException extends \Exception
 {
-    public function setErrorMessages($msg) {
-        (new Session)->setSession('error', $msg);
+    public function setErrorMessages($e) {
+        (new Session)->setSession('error', $e->getMessage().$e->getLine());
     }
 }
