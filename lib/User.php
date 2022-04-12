@@ -28,6 +28,10 @@ class User
             if (empty($postData['userId']) || empty($postData['userName']) || empty($postData['userPw']) || empty($postData['userPwC']) || empty($postData['userEmail'])) {
                 throw new Exception('필수 정보를 기입해 주세요');
             }
+
+            // DB 연결 시작
+            $db = new Database;
+
             $rebuildData = [];
             foreach ($postData as $key => $value) {
                 $inputData = trim($value);
@@ -39,7 +43,7 @@ class User
                         throw new Exception('아이디 형태가 올바르지 않습니다.');
                     }
                     // DB 중복 확인
-                    if ((new Database)->findOne('tr_account', ['id'], ['id' => $inputData])) {
+                    if ($db->findOne('tr_account', ['id'], ['id' => $inputData])) {
                         throw new Exception('중복된 아이디 입니다.');
                     }
                 }
@@ -67,7 +71,7 @@ class User
                     if(!filter_var($inputData, FILTER_VALIDATE_EMAIL)) {
                         throw new Exception('이메일 형식에 맞지 않습니다.');
                     }
-                    if ((new Database)->findOne('tr_account', ['email'], ['email' => $inputData])) {
+                    if ($db->findOne('tr_account', ['email'], ['email' => $inputData])) {
                         throw new Exception('중복된 이메일 입니다.');
                     }
                 }
@@ -75,26 +79,34 @@ class User
                 $rebuildData[$key] = $inputData;
             }
 
-            // DB 연결 시작 & 트렌 시작
-            $db = new Database;
+            // 트렌 시작
             $db->pdo->beginTransaction();
 
-            if(!$db->save('tr_account', $this->rule(), $rebuildData)) {
+            // 회원정보 저장
+            $userNo = $db->save('tr_account', $this->rule(), $rebuildData);
+            if(!$userNo) {
                 throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
             }
 
+            // 회원 마일리지 테이블 작성
+            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'status'=>'status'], ['user_no' => $userNo, 'status'=>'회원가입'])) {
+                throw new CustomException('회원 마일리지 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
+            }
+
+            // 인증 이메일 발송
             if((new MailSend)->sendRegisterEmail($postData) !== true) {
                 throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
             }
 
+
+            $db->pdo->commit();
             (new Session)->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
             header('Location: /');
             exit();
 
         } catch (CustomException $e) {
-            (new Database)->pdo->rollBack();
+            $db->pdo->rollBack();
             $e->setErrorMessage($e->getMessage());
-            header('Location: /');
         } catch (Exception $e) {
             (new Session)->setSession('error', $e->getMessage());
         }
@@ -166,17 +178,17 @@ class User
             $db->pdo->commit();
 
             $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
-            (new Session)->setSession('auth', $afterUserData);
-            (new Session)->setSession('success', '정보 수정이 완료 되었습니다.');
+            $session->setSession('auth', $afterUserData);
+            $session->setSession('success', '정보 수정이 완료 되었습니다.');
             header('Location: /');
             exit();
 
         } catch (CustomException $e) {
-            (new Database)->pdo->rollBack();
+            $db->pdo->rollBack();
             $e->setErrorMessage($e->getMessage());
 
         } catch (Exception $e) {
-            (new Session)->setSession('error', $e->getMessage());
+            $session->setSession('error', $e->getMessage());
         }
     }
 
@@ -200,7 +212,7 @@ class User
             exit();
 
         } catch (CustomException $e) {
-            (new Database)->pdo->rollBack();
+            $db->pdo->rollBack();
             $e->setErrorMessage($e->getMessage());
         }
     }
@@ -232,7 +244,7 @@ class User
             exit();
 
         } catch (CustomException $e) {
-            (new Database)->pdo->rollBack();
+            $db->pdo->rollBack();
             $e->setErrorMessage($e->getMessage());
             header('Location: /');
             exit();

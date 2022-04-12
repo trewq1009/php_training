@@ -9,7 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/config/config.php';
 
 class Database
 {
-    public \PDO $pdo;
+    public PDO $pdo;
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class Database
             $user = DB_USER;
             $password = DB_PASSWORD;
 
-            $this->pdo = new \PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
+            $this->pdo = new PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
         } catch (\PDOException | Exception $e) {
             die($e->getMessage());
         }
@@ -52,16 +52,14 @@ class Database
 
             // sql 문이 성공 했으면 1 반환
             $result = $statement->rowCount();
-
             if ($result == 0) {
                 throw new Exception();
             }
-
-            $this->pdo->commit();
-            return true;
+            
+            // insert 된 AI Index 가져오기
+            return $this->pdo->lastInsertId();
 
         } catch (\Exception $e) {
-            $this->pdo->rollBack();
             return false;
         }
     }

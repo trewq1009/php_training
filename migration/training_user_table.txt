@@ -1,4 +1,6 @@
-﻿-- tr_account Table Create SQL
+﻿-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
+
+-- tr_account Table Create SQL
 CREATE TABLE tr_account
 (
     `no`            TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
@@ -7,6 +9,7 @@ CREATE TABLE tr_account
     `name`          VARCHAR(10)    NOT NULL    COMMENT '이름',
     `email`         VARCHAR(45)    NOT NULL    COMMENT '이메일',
     `email_status`  CHAR(8)        NOT NULL    DEFAULT 'INACTIVE' COMMENT '이메일 인증',
+    `mileage`       INT            NOT NULL    DEFAULT 0 COMMENT '소유 마일리지',
     `status`        CHAR(5)        NOT NULL    DEFAULT 'ALIVE' COMMENT '회원 상태',
     `registered`    TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '가입 일자',
     `updated`       TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 날자',
@@ -26,9 +29,9 @@ CREATE TABLE tr_payment_log
     `user_no`              TINYINT      NOT NULL    COMMENT '결재 유저PK',
     `total_amount`         INT          NOT NULL    COMMENT '결재 금액',
     `method`               CHAR(10)     NOT NULL    COMMENT '결재 방식',
-    `payment_information`  JSON         NOT NULL    DEFAULT '{}' COMMENT '결제 정보',
+    `payment_information`  JSON         NOT NULL    COMMENT '결제 정보',
     `status`               CHAR(10)     NOT NULL    COMMENT '결재 상태',
-    `cancels`              JSON         NOT NULL    DEFAULT '{}' COMMENT '취소 정보',
+    `cancels`              JSON         NOT NULL    COMMENT '취소 정보',
     `requested_at`         TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '결제일자',
     `approved_at`          TIMESTAMP    NULL        COMMENT '승인일자',
      PRIMARY KEY (no)
