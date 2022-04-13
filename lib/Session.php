@@ -55,6 +55,4 @@ class Session
         }
         return $message;
     }
-
-
 }

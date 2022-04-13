@@ -4,6 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 use app\lib\Session;
 
 $auth = (new Session)->isSet('auth');
+var_dump($_SERVER);
 
 ?>
 <body>

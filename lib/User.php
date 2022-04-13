@@ -2,6 +2,8 @@
 namespace app\lib;
 
 use app\lib\exception\CustomException;
+use app\lib\exception\InputDataNullException;
+use app\lib\exception\InvalidParamsException;
 use Exception;
 
 class User
@@ -162,10 +164,19 @@ class User
                 $updateData['userPw'] = $session->isSet('auth')['password'];
             } else {
                 if(strlen($updateData['userPw']) < 8 || strlen($updateData['userPw']) > 20) {
-                    throw new Exception('비밀번호 형식에 맞지 않습니다.');
+                    throw new InvalidParamsException('비밀번호 형식에 맞지 않습니다.');
                 }
                 $updateData['userPw'] = password_hash($updateData['userPw'], PASSWORD_BCRYPT);
             }
+            if(empty($updateData['userName'])) {
+                throw new InputDataNullException('유저 이름이 공백 입니다.');
+            }
+            if($updateData['userName'] == 'userName') {
+                if (!preg_match("/^[가-힣]{9,}$/", $updateData['userName'])) {
+                    throw new InvalidParamsException('올바른 이름의 형태가 아닙니다.');
+                }
+            }
+
 
             // DB connect
             $db = new Database;
@@ -182,10 +193,14 @@ class User
             header('Location: /');
             exit();
 
+
+        } catch (InvalidParamsException $e) {
+            $e->setErrorMessages($e);
+        } catch (InputDataNullException $e) {
+            $e->setErrorMessages($e);
         } catch (CustomException $e) {
             $db->pdo->rollBack();
             $e->setErrorMessages($e);
-
         } catch (Exception $e) {
             $session->setSession('error', $e->getMessage());
         }
