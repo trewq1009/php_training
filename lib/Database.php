@@ -108,6 +108,7 @@ class Database
             $timeStamp = $date->format('Y-m-d H:i:s');
             $statement->bindValue(":updated", $timeStamp);
 
+
             // where
             foreach ($where as $whereKey => $whereItem) {
                 $statement->bindValue(":$whereKey", $whereItem);
@@ -124,7 +125,8 @@ class Database
             
             return true;
         } catch (Exception $e) {
-            return false;
+            var_dump($e);
+//            return false;
         }
     }
 

@@ -75,7 +75,6 @@ class User
                         throw new Exception('중복된 이메일 입니다.');
                     }
                 }
-
                 $rebuildData[$key] = $inputData;
             }
 
@@ -89,12 +88,12 @@ class User
             }
 
             // 회원 마일리지 테이블 작성
-            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'status'=>'status'], ['user_no' => $userNo, 'status'=>'join'])) {
+            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'method'=>'method'], ['user_no' => $userNo, 'method'=>'join'])) {
                 throw new CustomException('회원 마일리지 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
             }
 
             // 인증 이메일 발송
-            if((new MailSend)->sendRegisterEmail($postData) !== true) {
+            if((new MailSend)->sendRegisterEmail($postData, $userNo) !== true) {
                 throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
             }
 
@@ -106,7 +105,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessages($e->getMessage());
+            $e->setErrorMessages($e);
         } catch (Exception $e) {
             (new Session)->setSession('error', $e->getMessage());
         }
@@ -142,7 +141,7 @@ class User
             exit();
 
         } catch (CustomException $e) {
-            $e->setErrorMessages($e->getMessage());
+            $e->setErrorMessages($e);
         }
     }
 
@@ -185,7 +184,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessages($e->getMessage());
+            $e->setErrorMessages($e);
 
         } catch (Exception $e) {
             $session->setSession('error', $e->getMessage());
@@ -213,7 +212,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessages($e->getMessage());
+            $e->setErrorMessages($e);
         }
     }
 
@@ -229,12 +228,12 @@ class User
             $db = new Database;
             $db->pdo->beginTransaction();
 
-            $userData = $db->findOne('tr_account', ['id', 'status'], ['id' => $getData['training'], 'status' => 'ALIVE']);
+            $userData = $db->findOne('tr_account', ['no', 'status'], ['no' => $getData['training'], 'status' => 'ALIVE']);
             if(!$userData) {
                 throw new Exception('올바른 회원이 아닙니다.');
             }
 
-            if(!$db->update('tr_account', ['email_status' => 'email_status'], ['id' => $userData['id']], ['email_status' => 'ACTIVE'])) {
+            if(!$db->update('tr_account', ['email_status' => 'email_status'], ['no' => $userData['no']], ['email_status' => 'ACTIVE'])) {
                 throw new CustomException('인증에 문제가 발생했습니다. 관리자에게 문의 주세요');
             }
 
@@ -245,7 +244,7 @@ class User
 
         } catch (CustomException $e) {
             $db->pdo->rollBack();
-            $e->setErrorMessages($e->getMessage());
+            $e->setErrorMessages($e);
             header('Location: /');
             exit();
         } catch (Exception $e) {

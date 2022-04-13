@@ -107,7 +107,7 @@ class Payment
             $mileageRule = [
                 'user_no' => 'user_no',
                 'payment_no' => 'payment_no',
-                'status' => 'status',
+                'method' => 'method',
                 'before_mileage' => 'before_mileage',
                 'use_mileage' => 'use_mileage',
                 'total_mileage' => 'total_mileage'
@@ -115,7 +115,7 @@ class Payment
             $mileageParams = [
                 'user_no' => $_SESSION['auth']['no'],
                 'payment_no' => $paymentNo,
-                'status' => $postData['radioValue'],
+                'method' => $postData['radioValue'],
                 'before_mileage' => $_SESSION['auth']['mileage'],
                 'use_mileage' => $postData['price'],
                 'total_mileage' => $_SESSION['auth']['mileage'] + $postData['price']
@@ -225,7 +225,7 @@ class Payment
             $mileageRule = [
                 'user_no' => 'user_no',
                 'payment_no' => 'payment_no',
-                'status' => 'status',
+                'method' => 'method',
                 'before_mileage' => 'before_mileage',
                 'use_mileage' => 'use_mileage',
                 'total_mileage' => 'total_mileage'
@@ -233,7 +233,7 @@ class Payment
             $mileageParams = [
                 'user_no' => $_SESSION['auth']['no'],
                 'payment_no' => $paymentNo,
-                'status' => $postData['radioValue'],
+                'method' => $postData['radioValue'],
                 'before_mileage' => $_SESSION['auth']['mileage'],
                 'use_mileage' => $postData['price'],
                 'total_mileage' => $_SESSION['auth']['mileage'] + $postData['price']
@@ -332,7 +332,7 @@ class Payment
             $mileageRule = [
                 'user_no' => 'user_no',
                 'payment_no' => 'payment_no',
-                'status' => 'status',
+                'method' => 'method',
                 'before_mileage' => 'before_mileage',
                 'use_mileage' => 'use_mileage',
                 'total_mileage' => 'total_mileage'
@@ -340,7 +340,7 @@ class Payment
             $mileageParams = [
                 'user_no' => $_SESSION['auth']['no'],
                 'payment_no' => $paymentNo,
-                'status' => $postData['radioValue'],
+                'method' => $postData['radioValue'],
                 'before_mileage' => $_SESSION['auth']['mileage'],
                 'use_mileage' => $postData['price'],
                 'total_mileage' => $_SESSION['auth']['mileage'] + $postData['price']

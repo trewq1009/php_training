@@ -13,11 +13,11 @@ class MailSend
     protected string $from = EMAIL_USER;
     protected string $subject = '회원 가입 이메일';
 
-    public function sendRegisterEmail($userData): bool
+    public function sendRegisterEmail($userData, $userNo): bool
     {
         try {
             $this->to_email = $userData['userEmail'];
-            $link = $this->getLink($userData);
+            $link = $this->getLink($userNo);
             $mail = new PHPMailer(true);
             $mail->CharSet = "UTF-8";
 
@@ -69,10 +69,10 @@ class MailSend
         }
     }
 
-    public function getLink($userData)
+    public function getLink($userNo)
     {
-        $crypt = password_hash($userData['userPw'], PASSWORD_BCRYPT);
-        return APP_SITE.'/view/account.php?training='.$userData['userId'].'&hash='.$crypt;
+        $crypt = password_hash($userNo, PASSWORD_BCRYPT);
+        return APP_SITE.'/view/account.php?training='.$userNo.'&hash='.$crypt;
     }
 
 
