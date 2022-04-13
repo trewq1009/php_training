@@ -3,6 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 
 use app\lib\Session;
+use app\lib\Utils;
 
 if(!(new Session)->isSet('auth')) {
     (new Session)->setSession('error', '잘못된 경로 입니다.');

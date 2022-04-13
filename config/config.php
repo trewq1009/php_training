@@ -17,5 +17,8 @@ const EMAIL_USER = 'trewq1009@gmail.com';
 const EMAIL_PASSWORD = 'trewq951009';
 
 
+// encrypt
+const HASH = 'training';
+
 
 

@@ -10,8 +10,10 @@ $userModel = (new Session)->isSet('auth');
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     if($_POST['action'] === 'update') {
         (new User)->update($_POST);
-    } else {
+    } else if($_POST['action'] === 'delete') {
         (new User)->delete($userModel);
+    } else {
+        
     }
 } else {
     if(!$userModel) {
@@ -47,8 +49,17 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
             <label for="userEmail" class="form-label">Email</label>
             <input type="email" class="form-control" value="<?php echo $userModel['email'] ?>" name="userEmail" id="userEmail" readonly required>
         </div>
-        <button type="submit" name="action" value="update" class="btn btn-primary">정보수정</button>
-        <button type="submit" name="action" value="delete" class="btn btn-danger">탈퇴신청</button>
+        <div class="mb-3">
+            <label for="userMileage" class="form-label">Mileage</label>
+            <input type="text" class="form-control" value="<?php echo $userModel['mileage'] ?>" name="userMileage" id="userMileage" readonly required>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between">
+            <div>
+                <button type="submit" name="action" value="update" class="btn btn-primary">정보수정</button>
+                <button type="submit" name="action" value="withdrawal" class="btn btn-primary">마일리지 출금</button>
+            </div>
+            <button type="submit" name="action" value="delete" class="btn btn-danger">탈퇴신청</button>
+        </div>
     </form>
 </section>
 
