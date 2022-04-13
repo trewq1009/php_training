@@ -27,7 +27,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
 ?>
 <section class="container">
 <?php if($paymentModel['radioValue'] == 'credit'): ?>
-    <h1>카드 결재</h1>
+    <h1>카드 결제</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm" name="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
@@ -57,11 +57,10 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
             <input type="password" class="form-control" name="cardPassword" id="cardPassword" maxlength="4" required>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="button" class="btn btn-primary" onclick="btnAction()">Submit</button>
     </form>
 
 <?php elseif($paymentModel['radioValue'] == 'phone'): ?>
-    <h1>휴대폰</h1>
+    <h1>휴대폰 결제</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
@@ -96,7 +95,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 <?php elseif($paymentModel['radioValue'] == 'voucher'): ?>
-    <h1>상품권</h1>
+    <h1>상품권 결제</h1>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">

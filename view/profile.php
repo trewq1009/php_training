@@ -6,14 +6,17 @@ use app\lib\Session;
 use app\lib\User;
 
 $userModel = (new Session)->isSet('auth');
-
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     if($_POST['action'] === 'update') {
         (new User)->update($_POST);
     } else if($_POST['action'] === 'delete') {
         (new User)->delete($userModel);
     } else {
-        
+        if($_POST['userMileage'] < 10000) {
+            (new Session)->setSession('error', '출금할 마일리지가 부족합니다.(최소 1만)');
+        } else {
+
+        }
     }
 } else {
     if(!$userModel) {

@@ -84,7 +84,7 @@ class Payment
                 'total_amount' => $postData['price'],
                 'method' => $postData['radioValue'],
                 'payment_information' => json_encode($cardInformation),
-                'status' => 'SUCCESS',
+                'status' => 'success',
                 'cancels' => json_encode($cancels),
             ];
             $paymentRule = [
@@ -122,14 +122,12 @@ class Payment
             ];
 
             // 마일리지 로그 저장
-            if($paymentParams['status'] == 'success') {
-                if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
-                    throw new CustomException('마일리지 로그 저장 오류');
-                }
+            if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
+                throw new CustomException('마일리지 로그 저장 오류');
             }
 
             // 유저 정보 업데이트
-            if(!$db->update('tr_account', ['mileage'=>'mileage'], ['no'=>$_SESSION['auth']['no']], ['mileage'=> $mileageParams['total_mileage']])) {
+            if(!$db->update('tr_account', ['mileage' => 'mileage'], ['no' => $_SESSION['auth']['no']], ['mileage' => $mileageParams['total_mileage']])) {
                 throw new CustomException('유저 업데이트 오류');
             }
 
@@ -203,7 +201,7 @@ class Payment
                 'total_amount' => $postData['price'],
                 'method' => $postData['radioValue'],
                 'payment_information' => json_encode($phoneInformation),
-                'status' => 'SUCCESS',
+                'status' => 'success',
                 'cancels' => json_encode($cancels),
             ];
 
@@ -242,10 +240,8 @@ class Payment
             ];
 
             // 마일리지 로그 저장
-            if($paymentParams['status'] == 'success') {
-                if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
-                    throw new CustomException('마일리지 로그 저장 오류');
-                }
+            if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
+                throw new CustomException('마일리지 로그 저장 오류');
             }
 
             // 유저 정보 업데이트
@@ -312,7 +308,7 @@ class Payment
                 'total_amount' => $postData['price'],
                 'method' => $postData['radioValue'],
                 'payment_information' => json_encode($voucherInformation),
-                'status' => 'SUCCESS',
+                'status' => 'success',
                 'cancels' => json_encode($cancels),
             ];
 
@@ -351,10 +347,8 @@ class Payment
             ];
 
             // 마일리지 로그 저장
-            if($paymentParams['status'] == 'success') {
-                if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
-                    throw new CustomException('마일리지 로그 저장 오류');
-                }
+            if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
+                throw new CustomException('마일리지 로그 저장 오류');
             }
 
             // 유저 정보 업데이트
