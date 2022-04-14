@@ -11,13 +11,6 @@ class Board
     public $listHtml;
     public $listBtn;
 
-    public function __construct()
-    {
-        $this->field = new Field;
-        $this->db = new Database;
-        $this->session = new Session;
-    }
-
     protected function rule()
     {
         return [
@@ -37,17 +30,39 @@ class Board
         $url = explode('/', $url);
         $this->url = end($url);
 
-        $resultArr = $this->db->list($this->rule()[$this->url], $this->page);
+        $resultArr = (new Database)->list($this->rule()[$this->url], $this->page);
 
         // page list
-        $this->listHtml = $this->field->userList($resultArr['listData']);
+        $this->listHtml = (new Field)->userList($resultArr['listData']);
 
         // page button
         unset($resultArr['listData']);
         $resultArr['page'] = $this->page;
-        $this->listBtn = $this->field->listBtn($resultArr);
+        $this->listBtn = (new Field)->listBtn($resultArr);
     }
 
+
+    public function withdrawalList()
+    {
+        try {
+            $db = new Database;
+            $userList = $db->findAll('tr_mileage_use_log', ['status', 'method'], ['status'=>'AWAIT', 'method'=>'withdrawal']);
+
+            foreach ($userList as $key => $value) {
+                $userInfo = $db->findOne('tr_account', ['no'], ['no' => $value['user_no']]);
+                $userList[$key]['name'] = $userInfo['name'];
+                $userList[$key]['id'] = $userInfo['id'];
+                $userList[$key]['status'] = '출금신청';
+            }
+
+
+
+            return $userList;
+
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
+    }
 
 
 }

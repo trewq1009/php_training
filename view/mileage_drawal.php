@@ -10,7 +10,9 @@ if(!$auth) {
     header('Location: /');
 }
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    (new Payment)->cashWithDrawal($_POST);
+    (new Payment)->cashWithdrawal($_POST);
+} else {
+    $use_mileage = (new Payment)->getMileageInfo($auth['no']);
 }
 
 ?>
@@ -31,7 +33,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         </div>
         <div class="mb-3">
             <label for="trueMileage" class="form-label">출금 가능 마일리지</label>
-            <input type="text" class="form-control" value="<?php echo $auth['mileage'] ?>" name="trueMileage" id="trueMileage" readonly required>
+            <input type="text" class="form-control" value="<?php echo $auth['mileage'] - $use_mileage ?>" name="trueMileage" id="trueMileage" readonly required>
         </div>
         <div class="mb-3">
             <label for="drawalMileage" class="form-label">출금할 마일리지</label>

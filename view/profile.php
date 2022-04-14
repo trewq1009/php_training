@@ -10,6 +10,9 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         (new User)->update($_POST);
     } else if($_POST['action'] === 'delete') {
         (new User)->delete($auth);
+    } else if($_POST['action'] === 'mileageReport') {
+        $userNo = $auth['no'];
+        header("Location: /view/mileage_report.php?no=$userNo");
     } else {
         header('Location: /view/mileage_drawal.php');
     }
@@ -55,6 +58,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
             <div>
                 <button type="submit" name="action" value="update" class="btn btn-primary">정보수정</button>
                 <button type="submit" name="action" value="withdrawal" class="btn btn-primary">마일리지 출금</button>
+                <button type="submit" name="action" value="mileageReport" class="btn btn-info">마일리지 내역확인</button>
             </div>
             <button type="submit" name="action" value="delete" class="btn btn-danger">탈퇴신청</button>
         </div>

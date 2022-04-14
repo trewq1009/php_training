@@ -378,7 +378,7 @@ class Payment
     }
 
 
-    public function cashWithDrawal($postData)
+    public function cashWithdrawal($postData)
     {
         try {
             $auth = (new Session)->isSet('auth');
@@ -434,34 +434,9 @@ class Payment
                 throw new DatabaseException('출금 신청에 실패하였습니다.');
             }
 
-//            $mileageRule = ['user_no'=>'user_no', 'method'=>'method', 'mileage_use_log'=>'mileage_use_log',
-//                            'before_mileage'=>'before_mileage', 'use_mileage'=>'use_mileage', 'total_mileage'=>'total_mileage'];
-//
-//            $mileageParams = [
-//                'user_no' => $userModel['no'],
-//                'method' => 'withdrawal',
-//                'mileage_use_log' => $logNum,
-//                'before_mileage' => $userModel['mileage'],
-//                'use_mileage' => $postData['drawalMileage'],
-//                'total_mileage' => $userModel['mileage'] - $postData['drawalMileage']
-//            ];
-//
-//            // mileage table
-//            if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
-//                throw new DatabaseException('출금 신청에 실패하였습니다.');
-//            }
-//
-//            // user info update
-//            if(!$db->update('tr_account', ['mileage'=>'mileage'], ['no'=>$userModel['no']], ['mileage'=>$userModel['mileage'] - $postData['drawalMileage']])) {
-//                throw new DatabaseException('유저 정보 반영 실패');
-//            }
-//
-//            $newUserModel = $db->findOne('tr_account', ['no'], ['no'=>$userModel['no']]);
             $db->pdo->commit();
 
-            $session = new Session;
-//            $session->setSession('auth', $newUserModel);
-            $session->setSession('success', '출금 신청이 완료되었습니다.');
+            (new Session)->setSession('success', '출금 신청이 완료되었습니다.');
             header('Location: /');
 
 
@@ -482,6 +457,85 @@ class Payment
             $e->setErrorMessages($e);
         } catch (\Exception $e) {
             var_dump($e->getMessage());
+        }
+    }
+
+
+    public function withdrawalSuccess($postData)
+    {
+        try {
+            if (empty($postData['logNo']) || empty($postData['userNo'])) {
+                throw new InputDataNullException('필수 데이터가 없습니다.');
+            }
+            if($postData['userMileage'] < $postData['userWithdrawalAmount']) {
+                throw new InvalidParamsException('출금 하려는 금액이 잔액보다 큼니다.');
+            }
+
+            $db = new Database;
+            $db->pdo->beginTransaction();
+
+            if (!$db->update('tr_mileage_use_log', ['status' => 'status'], ['no' => $postData['logNo']], ['status' => 'success'])) {
+                throw new DatabaseException('로그 정보 수정에 실패하였습니다.');
+            }
+
+
+            $mileageRule = ['user_no' => 'user_no', 'method' => 'method', 'mileage_use_log' => 'mileage_use_log',
+                'before_mileage' => 'before_mileage', 'use_mileage' => 'use_mileage', 'total_mileage' => 'total_mileage'];
+            $mileageParams = [
+                'user_no' => $postData['userNo'],
+                'method' => 'withdrawal',
+                'mileage_use_log' => $postData['logNo'],
+                'before_mileage' => $postData['userMileage'],
+                'use_mileage' => $postData['userWithdrawalAmount'],
+                'total_mileage' => $postData['userMileage'] - $postData['userWithdrawalAmount']
+            ];
+
+            // mileage table
+            if (!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
+                throw new DatabaseException('정보 생성에 실패하였습니다.');
+            }
+
+            // user info update
+            if (!$db->update('tr_account', ['mileage' => 'mileage'], ['no' => $postData['userNo']], ['mileage' => $postData['userMileage'] - $postData['userWithdrawalAmount']])) {
+                throw new DatabaseException('유저 정보 반영 실패');
+            }
+
+            $db->pdo->commit();
+            (new Session)->setSession('success', '회원의 출금 신청을 완료하였습니다.');
+            header('Location: /view/imi/withdrawal_list.php');
+
+
+
+        } catch (InvalidParamsException $e) {
+            $e->setErrorMessages($e);
+            header('Location: /view/imi/withdrawal_list.php');
+        } catch (InputDataNullException $e) {
+            $e->setErrorMessages($e);
+            header('Location: /view/imi/withdrawal_list.php');
+        } catch (DatabaseException $e) {
+            $db->pdo->rollBack();
+            $e->setErrorMessages($e);
+            header('Location: /view/imi/withdrawal_list.php');
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
+    }
+
+
+    public function getMileageInfo($userNo)
+    {
+        try {
+            $db = new Database;
+            $withDrawalData = $db->findAll('tr_mileage_use_log', ['user_no', 'status'], ['user_no'=>$userNo, 'status'=>'AWAIT']);
+            if($withDrawalData) {
+                $totalDrawal = 0;
+                foreach ($withDrawalData as $item) {
+                    $totalDrawal = $totalDrawal + $item['use_mileage'];
+                }
+                return $totalDrawal;
+            }
+        } catch (\Exception $e) {
+            return false;
         }
     }
 

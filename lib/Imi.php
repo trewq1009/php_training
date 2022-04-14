@@ -28,9 +28,10 @@ class Imi
                 throw new Exception('계정을 다시 확인 해주세요.');
             }
 
-            if(!password_verify($postData['imiPw'], $userData['pw'])) {
+            if(!password_verify($postData['imiPw'], $userData['password'])) {
                 throw new Exception('패스워드를 다시 확인 해주세요.');
             }
+
 
             (new Session)->setSession('auth', $userData);
             header('Location: /view/imi/admin.php');

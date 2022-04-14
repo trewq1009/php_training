@@ -17,6 +17,9 @@ use app\lib\Session;
                     <li class="nav-item">
                         <a class="nav-link" href="/view/imi/user_list.php">Users</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view/imi/withdrawal_list.php">Withdrawal List</a>
+                    </li>
                     <?php endif; ?>
                 </ul>
 

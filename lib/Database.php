@@ -85,6 +85,26 @@ class Database
     }
 
 
+    public function findAll($tableName, $where, $params)
+    {
+        try {
+
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
+            foreach ($where as $item) {
+                $statement->bindValue(":$item", $params[$item]);
+            }
+
+            $statement->execute();
+            return $statement->fetchAll();
+
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+
     public function update($tableName, $rule, $where, $params)
     {
         try {
@@ -153,6 +173,27 @@ class Database
 
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+
+    public function selectJoin($firstTable, $secTable, $joinQuery, $params)
+    {
+        try {
+            $where = array_keys($params);
+
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+
+            $statement = $this->pdo->prepare("SELECT * FROM $firstTable LEFT JOIN $secTable ON $joinQuery WHERE $sql");
+            foreach ($where as $item) {
+                $statement->bindValue(":$item", $params[$item]);
+            }
+            $statement->execute();
+            return $statement->fetchAll();
+
+        } catch (Exception $e) {
+            var_dump($e->getMessage());
+//            return false;
         }
     }
 
