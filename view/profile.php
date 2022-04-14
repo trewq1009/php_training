@@ -5,21 +5,16 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
 use app\lib\Session;
 use app\lib\User;
 
-$userModel = (new Session)->isSet('auth');
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     if($_POST['action'] === 'update') {
         (new User)->update($_POST);
     } else if($_POST['action'] === 'delete') {
-        (new User)->delete($userModel);
+        (new User)->delete($auth);
     } else {
-        if($_POST['userMileage'] < 10000) {
-            (new Session)->setSession('error', '출금할 마일리지가 부족합니다.(최소 1만)');
-        } else {
-
-        }
+        header('Location: /view/mileage_drawal.php');
     }
 } else {
-    if(!$userModel) {
+    if(!$auth) {
         (new Session)->setSession('error', '잘못된 경로 입니다.');
         header('Location: /');
         exit();
@@ -38,11 +33,11 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
         <div class="mb-3">
             <label for="userId" class="form-label">ID</label>
-            <input type="text" class="form-control" value="<?php echo $userModel['id'] ?>" name="userId" id="userId" readonly required>
+            <input type="text" class="form-control" value="<?php echo $auth['id'] ?>" name="userId" id="userId" readonly required>
         </div>
         <div class="mb-3">
             <label for="userName" class="form-label">Name</label>
-            <input type="text" class="form-control" value="<?php echo $userModel['name'] ?>" name="userName" id="userName" required>
+            <input type="text" class="form-control" value="<?php echo $auth['name'] ?>" name="userName" id="userName" required>
         </div>
         <div class="mb-3">
             <label for="userPassword" class="form-label">Password</label>
@@ -50,11 +45,11 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         </div>
         <div class="mb-3">
             <label for="userEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" value="<?php echo $userModel['email'] ?>" name="userEmail" id="userEmail" readonly required>
+            <input type="email" class="form-control" value="<?php echo $auth['email'] ?>" name="userEmail" id="userEmail" readonly required>
         </div>
         <div class="mb-3">
             <label for="userMileage" class="form-label">Mileage</label>
-            <input type="text" class="form-control" value="<?php echo $userModel['mileage'] ?>" name="userMileage" id="userMileage" readonly required>
+            <input type="text" class="form-control" value="<?php echo $auth['mileage'] ?>" name="userMileage" id="userMileage" readonly required>
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between">
             <div>

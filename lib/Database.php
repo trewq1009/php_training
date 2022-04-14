@@ -125,8 +125,7 @@ class Database
             
             return true;
         } catch (Exception $e) {
-            var_dump($e);
-//            return false;
+            return false;
         }
     }
 

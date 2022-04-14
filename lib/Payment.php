@@ -2,10 +2,11 @@
 namespace app\lib;
 
 use app\lib\exception\CustomException;
+use app\lib\exception\DataValueChangedException;
 use app\lib\exception\InputDataNullException;
 use app\lib\exception\InvalidParamsException;
 use app\lib\exception\PaymentException;
-use app\lib\Utils;
+use app\lib\exception\DatabaseException;
 use stdClass;
 
 class Payment
@@ -366,8 +367,8 @@ class Payment
 
 
         } catch (InvalidParamsException $e) {
-                $e->setErrorMessages($e);
-                header('location: /view/mileage.php');
+            $e->setErrorMessages($e);
+            header('location: /view/mileage.php');
         } catch (InputDataNullException $e) {
             $e->setErrorMessages($e);
             header('location: /view/mileage.php');
@@ -376,6 +377,113 @@ class Payment
         }
     }
 
+
+    public function cashWithDrawal($postData)
+    {
+        try {
+            $auth = (new Session)->isSet('auth');
+            if(!$auth) {
+                throw new CustomException('로그인 정보가 없습니다.');
+            }
+            if(empty($postData['userNo'])) {
+                throw new CustomException('유저 정보가 없습니다.');
+            }
+            if(empty($postData['userMileage']) || empty($postData['trueMileage']) || empty($postData['drawalMileage']) || empty($postData['bankValue']) || empty($postData['bankNumber'])) {
+                throw new InputDataNullException('입력 데이터를 다시 확인해 주세요.');
+            }
+            if($postData['userMileage'] < 1000 || $postData['trueMileage'] < 1000) {
+                throw new InvalidParamsException('출금 가능한 최소 금액이 안됩니다.');
+            }
+            if($postData['trueMileage'] < $postData['drawalMileage']) {
+                throw new InvalidParamsException('출금 가능 마일리지를 넘었습니다.');
+            }
+            if($postData['drawalMileage'] < 1000) {
+                throw new InvalidParamsException('최소 출금 가능한 금액은 1000원 입니다.');
+            }
+            if (!preg_match("/^[0-9]/i", $postData['bankNumber'])) {
+                throw new InvalidParamsException('올바른 계좌 번호가 아닙니다. 숫자만 입력해 주세요.');
+            }
+            if (!preg_match("/^[0-9]/i", $postData['drawalMileage'])) {
+                throw new InvalidParamsException('올바른 금앱을 입력해 주세요.');
+            }
+
+            $db = new Database;
+            $userModel = $db->findOne('tr_account', ['no'], ['no'=>$auth['no']]);
+            if($userModel['mileage'] !== $auth['mileage']) {
+                (new Session)->setSession('auth', $userModel);
+                throw new DataValueChangedException('마일리지가 변동되었습니다. 다시 신청해 주세요.');
+            }
+
+            $logRule = ['user_no'=>'user_no', 'method'=>'method', 'use_mileage'=>'use_mileage', 'log_information'=>'log_information', 'status'=>'status'];
+            $useLog = new stdClass;
+            $useLog->bank = $postData['bankValue'];
+            $useLog->bank_account_number = (new Utils)->encrypt($postData['bankNumber']);
+
+            $logParams = [
+                'user_no' => $userModel['no'],
+                'method' => 'withdrawal',
+                'use_mileage' => $postData['drawalMileage'],
+                'log_information' => json_encode($useLog),
+                'status' => 'AWAIT'
+            ];
+
+            // 로그 저장
+            $db->pdo->beginTransaction();
+            $logNum = $db->save('tr_mileage_use_log', $logRule, $logParams);
+            if(!$logNum) {
+                throw new DatabaseException('출금 신청에 실패하였습니다.');
+            }
+
+//            $mileageRule = ['user_no'=>'user_no', 'method'=>'method', 'mileage_use_log'=>'mileage_use_log',
+//                            'before_mileage'=>'before_mileage', 'use_mileage'=>'use_mileage', 'total_mileage'=>'total_mileage'];
+//
+//            $mileageParams = [
+//                'user_no' => $userModel['no'],
+//                'method' => 'withdrawal',
+//                'mileage_use_log' => $logNum,
+//                'before_mileage' => $userModel['mileage'],
+//                'use_mileage' => $postData['drawalMileage'],
+//                'total_mileage' => $userModel['mileage'] - $postData['drawalMileage']
+//            ];
+//
+//            // mileage table
+//            if(!$db->save('tr_mileage', $mileageRule, $mileageParams)) {
+//                throw new DatabaseException('출금 신청에 실패하였습니다.');
+//            }
+//
+//            // user info update
+//            if(!$db->update('tr_account', ['mileage'=>'mileage'], ['no'=>$userModel['no']], ['mileage'=>$userModel['mileage'] - $postData['drawalMileage']])) {
+//                throw new DatabaseException('유저 정보 반영 실패');
+//            }
+//
+//            $newUserModel = $db->findOne('tr_account', ['no'], ['no'=>$userModel['no']]);
+            $db->pdo->commit();
+
+            $session = new Session;
+//            $session->setSession('auth', $newUserModel);
+            $session->setSession('success', '출금 신청이 완료되었습니다.');
+            header('Location: /');
+
+
+
+        } catch (DatabaseException $e) {
+            $db->pdo->rollBack();
+            $e->setErrorMessages($e);
+            header('Location: /');
+        } catch (DataValueChangedException $e) {
+            $e->setErrorMessages($e);
+            header('Location: /view/profile.php');
+        } catch (CustomException $e) {
+            $e->setErrorMessages($e);
+            header('Location: /');
+        } catch (InvalidParamsException $e) {
+            $e->setErrorMessages($e);
+        } catch (InputDataNullException $e) {
+            $e->setErrorMessages($e);
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
+    }
 
 
 }

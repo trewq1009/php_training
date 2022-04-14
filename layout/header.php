@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 use app\lib\Session;
 
 $auth = (new Session)->isSet('auth');
-var_dump($_SERVER);
+
 
 ?>
 <body>
@@ -27,8 +27,10 @@ var_dump($_SERVER);
                             <a class="nav-link" href="/view/profile.php">프로필</a>
                         </li>
                         <li class="nav-item" style="display: flex">
+                            <!--
                             <p class="nav-link"><?php echo $auth['mileage'] ?></p>
-                            <a class="nav-link" href="/view/mileage.php">충전</a>
+                            -->
+                            <a class="nav-link" href="/view/mileage.php">마일리지 충전</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/view/logout.php">로그아웃</a>

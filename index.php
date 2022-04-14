@@ -16,9 +16,16 @@ use app\lib\Session;
                 <?php echo (new Session)->getFlash('error') ?>
             </div>
         <?php endif; ?>
+
         <div>
             <h3>Hello PHP</h3>
         </div>
+        <?php if($auth): ?>
+        <div>
+            <h5>유저 : <?php echo $auth['id'] ?></h5>
+            <h5>마일리지 : <?php echo $auth['mileage'] ?></h5>
+        </div>
+        <?php endif ?>
     </section>
 
 
