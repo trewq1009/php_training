@@ -16,8 +16,11 @@ CREATE TABLE tr_account
 
 ALTER TABLE tr_account COMMENT '회원 테이블';
 
-CREATE UNIQUE INDEX UQ_tr_account_1
-    ON tr_account(id, email);
+CREATE INDEX IX_tr_account_2
+    ON tr_account(id);
+
+CREATE INDEX IX_tr_account_1
+    ON tr_account(no, id);
 
 
 -- tr_payment_log Table Create SQL
@@ -36,6 +39,15 @@ CREATE TABLE tr_payment_log
 
 ALTER TABLE tr_payment_log COMMENT '결재 로그 테이블';
 
+CREATE INDEX IX_tr_payment_log_2
+    ON tr_payment_log(method, status);
+
+CREATE INDEX IX_tr_payment_log_3
+    ON tr_payment_log(user_no, method);
+
+CREATE INDEX IX_tr_payment_log_1
+    ON tr_payment_log(user_no, status);
+
 ALTER TABLE tr_payment_log
     ADD CONSTRAINT FK_tr_payment_log_user_no_tr_account_no FOREIGN KEY (user_no)
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
@@ -51,11 +63,14 @@ CREATE TABLE tr_mileage_use_log
     `log_information`  TEXT           NOT NULL    COMMENT '행동 정보',
     `status`           CHAR(8)        NOT NULL    COMMENT '상태',
     `requested_at`     TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '발생 일자',
-    `approved_at`      TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+    `updated`          TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 
 ALTER TABLE tr_mileage_use_log COMMENT '마일리지 사용 로그';
+
+CREATE INDEX IX_tr_mileage_use_log_1
+    ON tr_mileage_use_log(user_no, status);
 
 ALTER TABLE tr_mileage_use_log
     ADD CONSTRAINT FK_tr_mileage_use_log_user_no_tr_account_no FOREIGN KEY (user_no)
@@ -87,9 +102,9 @@ CREATE TABLE tr_mileage
 (
     `no`                 TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
     `user_no`            TINYINT        NOT NULL    COMMENT '유저 PK',
+    `method`             VARCHAR(10)    NOT NULL    COMMENT '행동',
     `payment_no`         TINYINT        NULL        COMMENT '결재 로그 PK',
     `mileage_use_log`    TINYINT        NULL        COMMENT '마일리지 사용 로그 PK',
-    `method`             VARCHAR(10)    NOT NULL    COMMENT '행동',
     `before_mileage`     INT            NOT NULL    DEFAULT 0 COMMENT '이전 소유 마일리지',
     `use_mileage`        INT            NOT NULL    DEFAULT 0 COMMENT '변동 마일리지',
     `total_mileage`      INT            NOT NULL    DEFAULT 0 COMMENT '총 소유 마일리지',
@@ -98,6 +113,9 @@ CREATE TABLE tr_mileage
 );
 
 ALTER TABLE tr_mileage COMMENT '마일리지 테이블';
+
+CREATE INDEX IX_tr_mileage_1
+    ON tr_mileage(user_no);
 
 ALTER TABLE tr_mileage
     ADD CONSTRAINT FK_tr_mileage_payment_no_tr_payment_log_no FOREIGN KEY (payment_no)
@@ -110,3 +128,5 @@ ALTER TABLE tr_mileage
 ALTER TABLE tr_mileage
     ADD CONSTRAINT FK_tr_mileage_mileage_use_log_tr_mileage_use_log_no FOREIGN KEY (mileage_use_log)
         REFERENCES tr_mileage_use_log (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
