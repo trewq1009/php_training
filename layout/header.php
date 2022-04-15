@@ -17,7 +17,7 @@ $auth = (new Session)->isSet('auth');
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
+                        <a class="nav-link" href="/view/trad.php">Trade</a>
                     </li>
                 </ul>
 
