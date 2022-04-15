@@ -136,7 +136,7 @@ class Payment
             $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
             $session = new Session;
             $session->setSession('auth', $afterUserData);
-            $session->setSession('success', '결재가 완료 되었습니다.');
+            $session->setSession('success', '결제가 완료 되었습니다.');
             header('Location: /');
             exit();
 
@@ -254,7 +254,7 @@ class Payment
             $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
             $session = new Session;
             $session->setSession('auth', $afterUserData);
-            $session->setSession('success', '결재가 완료 되었습니다.');
+            $session->setSession('success', '결제가 완료 되었습니다.');
             header('Location: /');
             exit();
 
@@ -361,7 +361,7 @@ class Payment
             $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
             $session = new Session;
             $session->setSession('auth', $afterUserData);
-            $session->setSession('success', '결재가 완료 되었습니다.');
+            $session->setSession('success', '결제가 완료 되었습니다.');
             header('Location: /');
             exit();
 

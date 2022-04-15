@@ -30,9 +30,9 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
             </thead>
             <tbody>
             <?php if($list): ?>
-                <?php foreach ($list as $item): ?>
+                <?php foreach ($list as $key => $item): ?>
                     <tr>
-                        <th scope="row"><?php echo $item['no'] ?></th>
+                        <th scope="row"><?php echo $key + 1 ?></th>
                         <td><?php echo $item['method'] ?></td>
                         <td><?php echo $item['before_mileage'] ?></td>
                         <td><?php echo $item['use_mileage'] ?></td>

@@ -1,20 +1,23 @@
 ﻿-- tr_account Table Create SQL
 CREATE TABLE tr_account
 (
-    `no`            TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `id`            VARCHAR(20)    NOT NULL    COMMENT '아이디',
-    `password`      CHAR(60)       NOT NULL    COMMENT '패스워드',
-    `name`          VARCHAR(10)    NOT NULL    COMMENT '이름',
-    `email`         VARCHAR(45)    NOT NULL    COMMENT '이메일',
-    `email_status`  CHAR(8)        NOT NULL    DEFAULT 'INACTIVE' COMMENT '이메일 인증',
-    `mileage`       INT            NOT NULL    DEFAULT 0 COMMENT '소유 마일리지',
-    `status`        CHAR(5)        NOT NULL    DEFAULT 'ALIVE' COMMENT '회원 상태',
-    `registered`    TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '가입 일자',
-    `updated`       TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 날자',
+    `no`            TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `id`            VARCHAR(20)     NOT NULL    COMMENT '아이디',
+    `password`      CHAR(60)        NOT NULL    COMMENT '패스워드',
+    `name`          VARCHAR(10)     NOT NULL    COMMENT '이름',
+    `email`         VARCHAR(45)     NOT NULL    COMMENT '이메일',
+    `email_status`  CHAR(8)         NOT NULL    DEFAULT 'INACTIVE' COMMENT '이메일 인증',
+    `mileage`       INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '소유 마일리지',
+    `status`        CHAR(5)         NOT NULL    DEFAULT 'ALIVE' COMMENT '회원 상태',
+    `registered`    TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '가입 일자',
+    `updated`       TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 날자',
      PRIMARY KEY (no)
 );
 
 ALTER TABLE tr_account COMMENT '회원 테이블';
+
+CREATE INDEX IX_tr_account_3
+    ON tr_account(email);
 
 CREATE INDEX IX_tr_account_2
     ON tr_account(id);
@@ -26,26 +29,26 @@ CREATE INDEX IX_tr_account_1
 -- tr_payment_log Table Create SQL
 CREATE TABLE tr_payment_log
 (
-    `no`                   TINYINT      NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`              TINYINT      NOT NULL    COMMENT '결재 유저PK',
-    `total_amount`         INT          NOT NULL    COMMENT '결재 금액',
-    `method`               CHAR(10)     NOT NULL    COMMENT '결재 방식',
-    `payment_information`  TEXT         NOT NULL    COMMENT '결제 정보',
-    `status`               CHAR(10)     NOT NULL    COMMENT '결재 상태',
-    `cancels`              TEXT         NOT NULL    COMMENT '취소 정보',
-    `requested_at`         TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '결제일자',
+    `no`                   TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`              TINYINT         NOT NULL    COMMENT '결제 유저PK',
+    `total_amount`         INT UNSIGNED    NOT NULL    COMMENT '결제 금액',
+    `method`               CHAR(10)        NOT NULL    COMMENT '결제 방식',
+    `payment_information`  TEXT            NOT NULL    COMMENT '결제 정보',
+    `status`               CHAR(10)        NOT NULL    COMMENT '결제 상태',
+    `cancels`              TEXT            NOT NULL    COMMENT '취소 정보',
+    `requested_at`         TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '결제일자',
      PRIMARY KEY (no)
 );
 
-ALTER TABLE tr_payment_log COMMENT '결재 로그 테이블';
+ALTER TABLE tr_payment_log COMMENT '결제 로그 테이블';
 
 CREATE INDEX IX_tr_payment_log_2
-    ON tr_payment_log(method, status);
-
-CREATE INDEX IX_tr_payment_log_3
-    ON tr_payment_log(user_no, method);
+    ON tr_payment_log(method, user_no);
 
 CREATE INDEX IX_tr_payment_log_1
+    ON tr_payment_log(user_no);
+
+CREATE INDEX IX_tr_payment_log_3
     ON tr_payment_log(user_no, status);
 
 ALTER TABLE tr_payment_log
@@ -56,21 +59,27 @@ ALTER TABLE tr_payment_log
 -- tr_mileage_use_log Table Create SQL
 CREATE TABLE tr_mileage_use_log
 (
-    `no`               TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`          TINYINT        NOT NULL    COMMENT '유저 PK',
-    `method`           VARCHAR(10)    NOT NULL    COMMENT '행동',
-    `use_mileage`      INT            NOT NULL    COMMENT '사용 금액',
-    `log_information`  TEXT           NOT NULL    COMMENT '행동 정보',
-    `status`           CHAR(8)        NOT NULL    COMMENT '상태',
-    `requested_at`     TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '발생 일자',
-    `updated`          TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+    `no`               TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`          TINYINT         NOT NULL    COMMENT '유저 PK',
+    `method`           VARCHAR(10)     NOT NULL    COMMENT '행동',
+    `use_mileage`      INT UNSIGNED    NOT NULL    COMMENT '사용 금액',
+    `log_information`  TEXT            NOT NULL    COMMENT '행동 정보',
+    `status`           CHAR(8)         NOT NULL    COMMENT '상태',
+    `requested_at`     TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '발생 일자',
+    `updated`          TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 
 ALTER TABLE tr_mileage_use_log COMMENT '마일리지 사용 로그';
 
+CREATE INDEX IX_tr_mileage_use_log_3
+    ON tr_mileage_use_log(status);
+
 CREATE INDEX IX_tr_mileage_use_log_1
-    ON tr_mileage_use_log(user_no, status);
+    ON tr_mileage_use_log(user_no);
+
+CREATE INDEX IX_tr_mileage_use_log_2
+    ON tr_mileage_use_log(user_no, method);
 
 ALTER TABLE tr_mileage_use_log
     ADD CONSTRAINT FK_tr_mileage_use_log_user_no_tr_account_no FOREIGN KEY (user_no)
@@ -100,22 +109,34 @@ CREATE UNIQUE INDEX UQ_tr_account_admin_1
 -- tr_mileage Table Create SQL
 CREATE TABLE tr_mileage
 (
-    `no`                 TINYINT        NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`            TINYINT        NOT NULL    COMMENT '유저 PK',
-    `method`             VARCHAR(10)    NOT NULL    COMMENT '행동',
-    `payment_no`         TINYINT        NULL        COMMENT '결재 로그 PK',
-    `mileage_use_log`    TINYINT        NULL        COMMENT '마일리지 사용 로그 PK',
-    `before_mileage`     INT            NOT NULL    DEFAULT 0 COMMENT '이전 소유 마일리지',
-    `use_mileage`        INT            NOT NULL    DEFAULT 0 COMMENT '변동 마일리지',
-    `total_mileage`      INT            NOT NULL    DEFAULT 0 COMMENT '총 소유 마일리지',
-    `registration_date`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '등록일자',
+    `no`                 TINYINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            TINYINT         NOT NULL    COMMENT '유저 PK',
+    `method`             VARCHAR(10)     NOT NULL    COMMENT '행동',
+    `payment_no`         TINYINT         NULL        COMMENT '결재 로그 PK',
+    `mileage_use_log`    TINYINT         NULL        COMMENT '마일리지 사용 로그 PK',
+    `before_mileage`     INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '이전 소유 마일리지',
+    `use_mileage`        INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '변동 마일리지',
+    `total_mileage`      INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '총 소유 마일리지',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일자',
      PRIMARY KEY (no)
 );
 
 ALTER TABLE tr_mileage COMMENT '마일리지 테이블';
 
+CREATE INDEX IX_tr_mileage_2
+    ON tr_mileage(method);
+
+CREATE INDEX IX_tr_mileage_5
+    ON tr_mileage(mileage_use_log);
+
+CREATE INDEX IX_tr_mileage_4
+    ON tr_mileage(payment_no);
+
 CREATE INDEX IX_tr_mileage_1
     ON tr_mileage(user_no);
+
+CREATE INDEX IX_tr_mileage_3
+    ON tr_mileage(user_no, method);
 
 ALTER TABLE tr_mileage
     ADD CONSTRAINT FK_tr_mileage_payment_no_tr_payment_log_no FOREIGN KEY (payment_no)
