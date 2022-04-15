@@ -3,6 +3,9 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 
 use app\lib\Session;
 
+if(!session_id()) {
+    session_start();
+}
 $auth = (new Session)->isSet('auth');
 
 

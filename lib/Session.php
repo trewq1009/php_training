@@ -14,9 +14,6 @@ class Session
 
     public function setSession($sessionName, $sessionValue)
     {
-        if(!session_id()) {
-            session_start();
-        }
         if(isset($_SESSION["$sessionName"])) {
             $this->removeSession($sessionName);
         }
@@ -26,9 +23,6 @@ class Session
 
     public function removeSession($sessionName)
     {
-        if(!session_id()) {
-            session_start();
-        }
         if(isset($_SESSION["$sessionName"])) {
             unset($_SESSION["$sessionName"]);
         }
@@ -37,18 +31,12 @@ class Session
 
     public function isSet(string $key)
     {
-        if(!session_id()) {
-            session_start();
-        }
         return $_SESSION[$key] ?? false;
     }
 
 
     public function getFlash(string $key)
     {
-        if(!session_id()) {
-            session_start();
-        }
         $message = $_SESSION[$key] ?? false;
         if($message) {
             unset($_SESSION[$key]);

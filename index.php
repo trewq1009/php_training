@@ -4,6 +4,8 @@ require_once __DIR__.'/layout/header.php';
 
 use app\lib\Session;
 
+var_dump(json_encode(['text'=>'test', 'type'=>'1111']));
+
 ?>
 
     <section class="container">
