@@ -2,14 +2,9 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
-use app\lib\User;
 use app\lib\Session;
 
-$userId = '';
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    $userId = $_POST['userId'];
-    (new User)->logIn($_POST);
-}
+$userId = $_GET['userId'] ?? '';
 
 ?>
 
@@ -20,7 +15,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         </div>
     <?php endif; ?>
 
-    <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
+    <form action='<?php echo htmlspecialchars('./login_action.php');?>' method="post" id="methodForm">
         <div class="mb-3">
             <label for="userId" class="form-label">ID</label>
             <input type="text" class="form-control" value="<?php echo $userId ?>" name="userId" id="userId" required>
