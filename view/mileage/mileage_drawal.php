@@ -1,18 +1,20 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
-use app\lib\Payment;
+use app\lib\Database;
 
-if(!$auth) {
-    (new Session)->setSession('error', '잘못된 경로 입니다.');
+try {
+    if(!$auth) {
+        throw new Exception('잘못된 경로 입니다.');
+    }
+    $db = new Database;
+    $mileageModel = $db->findone('tr_mileage', ['user_no'=>$auth['no']]);
+
+} catch (Exception $e) {
+    Session::setSession('error', $e->getMessage());
     header('Location: /');
-}
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    (new Payment)->cashWithdrawal($_POST);
-} else {
-    $use_mileage = (new Payment)->getMileageInfo($auth['no']);
 }
 
 ?>
@@ -25,15 +27,18 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
     <?php endif; ?>
 
 
-    <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
-        <input type="hidden" name="userNo" value="<?php echo $auth['no'] ?>">
+    <form action='<?php echo htmlspecialchars('./mileage_drawal_action.php');?>' method="post" id="methodForm">
         <div class="mb-3">
-            <label for="userMileage" class="form-label">보유 마일리지</label>
-            <input type="text" class="form-control" value="<?php echo $auth['mileage'] ?>" name="userMileage" id="userMileage" readonly required>
+            <label for="usingMileage" class="form-label">사용중 마일리지</label>
+            <input type="text" class="form-control" value="<?php echo $mileageModel['using_mileage'] ?>" name="usingMileage" id="usingMileage" readonly required>
         </div>
         <div class="mb-3">
-            <label for="trueMileage" class="form-label">출금 가능 마일리지</label>
-            <input type="text" class="form-control" value="<?php echo $auth['mileage'] - $use_mileage ?>" name="trueMileage" id="trueMileage" readonly required>
+            <label for="useMileage" class="form-label">사용 가능 마일리지</label>
+            <input type="text" class="form-control" value="<?php echo $mileageModel['use_mileage'] ?>" name="useMileage" id="useMileage" readonly required>
+        </div>
+        <div class="mb-3">
+            <label for="realMileage" class="form-label">출금 가능 마일리지</label>
+            <input type="text" class="form-control" value="<?php echo $mileageModel['real_mileage'] ?>" name="realMileage" id="realMileage" readonly required>
         </div>
         <div class="mb-3">
             <label for="drawalMileage" class="form-label">출금할 마일리지</label>

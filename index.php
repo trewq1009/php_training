@@ -1,10 +1,13 @@
 <?php
-require_once __DIR__.'/layout/head.php';
-require_once __DIR__.'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
+use app\lib\Database;
 
-var_dump(json_encode(['text'=>'test', 'type'=>'1111']));
+if($auth) {
+    $mileage = (new Database)->findOne('tr_mileage', ['user_no'=>$auth['no']]);
+}
 
 ?>
 
@@ -24,8 +27,10 @@ var_dump(json_encode(['text'=>'test', 'type'=>'1111']));
         </div>
         <?php if($auth): ?>
         <div>
-            <h5>유저 : <?php echo $auth['id'] ?></h5>
-            <h5>마일리지 : <?php echo $auth['mileage'] ?></h5>
+            <h5>유저 : <?php echo $auth['name'] ?></h5>
+            <h5>사용 중인 마일리지 : <?php echo $mileage['using_mileage'] ?></h5>
+            <h5>사용 가능 마일리지 : <?php echo $mileage['use_mileage'] ?></h5>
+            <h5>출금 가능 마일리지 : <?php echo $mileage['real_mileage'] ?></h5>
         </div>
         <?php endif ?>
     </section>

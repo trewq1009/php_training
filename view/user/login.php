@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\User;
 use app\lib\Session;

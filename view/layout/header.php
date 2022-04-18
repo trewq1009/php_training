@@ -1,12 +1,11 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
-
-use app\lib\Session;
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 if(!session_id()) {
     session_start();
 }
-$auth = (new Session)->isSet('auth');
+
+$auth = $_SESSION['auth'] ?? false;
 
 
 ?>
@@ -27,25 +26,22 @@ $auth = (new Session)->isSet('auth');
                 <?php if($auth): ?>
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="/view/profile.php">프로필</a>
+                            <a class="nav-link" href="/view/user/profile.php">프로필</a>
                         </li>
                         <li class="nav-item" style="display: flex">
-                            <!--
-                            <p class="nav-link"><?php echo $auth['mileage'] ?></p>
-                            -->
-                            <a class="nav-link" href="/view/mileage.php">마일리지 충전</a>
+                            <a class="nav-link" href="/view/mileage/mileage.php">마일리지 충전</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/view/logout.php">로그아웃</a>
+                            <a class="nav-link" href="/view/user/logout.php">로그아웃</a>
                         </li>
                     </ul>
                 <?php else: ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/login.php">Login</a>
+                        <a class="nav-link" href="/view/user/login.php">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/register.php">회원가입</a>
+                        <a class="nav-link" href="/view/registered/register.php">회원가입</a>
                     </li>
                 </ul>
                 <?php endif; ?>

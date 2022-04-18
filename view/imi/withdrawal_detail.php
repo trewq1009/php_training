@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/imi/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/header.php';
 
 use app\lib\Database;
 use app\lib\Session;

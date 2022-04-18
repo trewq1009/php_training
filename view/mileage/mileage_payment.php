@@ -1,34 +1,37 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
-use app\lib\Payment;
 
-$paymentModel = '';
-$preUrl = $_SERVER['HTTP_REFERER'];
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
+try {
+    $preUrl = $_SERVER['HTTP_REFERER'];
     $paymentModel = $_GET;
-    if($paymentModel['price'] < 1000) {
-        (new Session)->setSession('error', '최소 금액은 1000원 입니다.');
-        header("Location: $preUrl");
-        exit();
+
+    if ($paymentModel['price'] < 1000) {
+        throw new Exception('최소 금액은 1000원 입니다.');
     }
-} else {
-    $paymentModel = $_POST;
-    if($paymentModel['radioValue'] == 'credit') {
-        (new Payment)->cardPayment($_POST);
-    } else if($paymentModel['radioValue'] == 'phone') {
-        (new Payment)->phonePayment($_POST);
-    } else if($paymentModel['radioValue'] == 'voucher') {
-        (new Payment)->voucherPayment($_POST);
-    }
+
+} catch (Exception $e) {
+    Session::setSession('error', '최소 금액은 1000원 입니다.');
+    header("Location: $preUrl");
 }
+
+//} else {
+//    $paymentModel = $_POST;
+//    if($paymentModel['radioValue'] == 'credit') {
+//        (new Payment)->cardPayment($_POST);
+//    } else if($paymentModel['radioValue'] == 'phone') {
+//        (new Payment)->phonePayment($_POST);
+//    } else if($paymentModel['radioValue'] == 'voucher') {
+//        (new Payment)->voucherPayment($_POST);
+//    }
+//}
 ?>
 <section class="container">
 <?php if($paymentModel['radioValue'] == 'credit'): ?>
     <h1>카드 결제</h1>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm" name="methodForm">
+    <form action="<?php echo htmlspecialchars('./mileage_payment_action.php') ?>" method="post" id="methodForm" name="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
 
@@ -61,7 +64,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
 
 <?php elseif($paymentModel['radioValue'] == 'phone'): ?>
     <h1>휴대폰 결제</h1>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm">
+    <form action="<?php echo htmlspecialchars('./mileage_payment_action.php') ?>" method="post" id="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
 
@@ -96,7 +99,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
     </form>
 <?php elseif($paymentModel['radioValue'] == 'voucher'): ?>
     <h1>상품권 결제</h1>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post" id="methodForm">
+    <form action="<?php echo htmlspecialchars('./mileage_payment_action.php') ?>" method="post" id="methodForm">
         <input type="hidden" value="<?php echo $paymentModel['radioValue'] ?>" name="radioValue">
         <input type="hidden" value="<?php echo $paymentModel['price'] ?>" name="price">
 

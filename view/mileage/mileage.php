@@ -1,11 +1,11 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
 use app\lib\Utils;
 
-if(!(new Session)->isSet('auth')) {
+if(!$auth) {
     (new Session)->setSession('error', '잘못된 경로 입니다.');
     header('Location: /');
     exit();
@@ -19,7 +19,7 @@ if(!(new Session)->isSet('auth')) {
         </div>
     <?php endif; ?>
 
-    <form action='/view/mileage_payment.php' method="get" id="methodForm">
+    <form action='<?php echo htmlspecialchars('./mileage_payment.php');?>' method="get" id="methodForm">
     <div style="display: flex; align-items: center; justify-content: center;">
         <span style="font-size: 3rem; color: rgba(13,110,153,1);">충전</span>
     </div>

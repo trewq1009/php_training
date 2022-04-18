@@ -521,23 +521,4 @@ class Payment
         }
     }
 
-
-    public function getMileageInfo($userNo)
-    {
-        try {
-            $db = new Database;
-            $withDrawalData = $db->findAll('tr_mileage_use_log', ['user_no', 'status'], ['user_no'=>$userNo, 'status'=>'AWAIT']);
-            if($withDrawalData) {
-                $totalDrawal = 0;
-                foreach ($withDrawalData as $item) {
-                    $totalDrawal = $totalDrawal + $item['use_mileage'];
-                }
-                return $totalDrawal;
-            }
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-
 }

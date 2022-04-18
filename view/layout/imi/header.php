@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 use app\lib\Session;
 if(!session_id()) {
@@ -29,7 +29,7 @@ if(!session_id()) {
                 <?php if((new Session)->isSet('auth')): ?>
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="/view/logout.php">로그아웃</a>
+                            <a class="nav-link" href="/view/user/logout.php">로그아웃</a>
                         </li>
                     </ul>
                 <?php else: ?>

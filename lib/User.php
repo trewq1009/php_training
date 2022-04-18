@@ -84,14 +84,19 @@ class User
             $db->pdo->beginTransaction();
 
             // 회원정보 저장
-            $userNo = $db->save('tr_account', $this->rule(), $rebuildData);
+            $userNo = $db->save('tr_account', ['id'=>$rebuildData['userId'], 'password'=>$rebuildData['userPw'], 'name'=>$rebuildData['userName'], 'email'=>$rebuildData['userEmail']]);
             if(!$userNo) {
                 throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
             }
 
-            // 회원 마일리지 테이블 작성
-            if(!$db->save('tr_mileage', ['user_no'=>'user_no', 'method'=>'method'], ['user_no' => $userNo, 'method'=>'join'])) {
-                throw new CustomException('회원 마일리지 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
+            // 회원 마일리지 로그 테이블
+            if(!$db->save('tr_mileage_log', ['user_no'=>$userNo, 'method'=>'join'])) {
+                throw new CustomException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
+            }
+
+            // 회원 마일리지 테이블
+            if(!$db->save('tr_mileage', ['user_no'=>$userNo])) {
+                throw new CustomException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
             }
 
             // 인증 이메일 발송
@@ -122,7 +127,7 @@ class User
             }
 
             // DB 계정 확인
-            $userData = (new Database)->findOne('tr_account', ['id', 'status'], ['id' => $postData['userId'], 'status' => 'ALIVE']);
+            $userData = (new Database)->findOne('tr_account', ['id' => $postData['userId'], 'status' => 'ALIVE']);
             if(!$userData) {
                 throw new CustomException('계정을 다시 확인 해주세요.');
             }
@@ -138,7 +143,7 @@ class User
             }
 
             // 로그인
-            (new Session)->setSession('auth', $userData);
+            (new Session)->setSession('auth', ['no'=>$userData['no'], 'name'=>$userData['name']]);
             header('Location: /');
             exit();
 
@@ -153,57 +158,6 @@ class User
         (new Session)->removeSession('auth');
         header('Location: /');
         exit();
-    }
-
-
-    public function update($updateData)
-    {
-        try {
-            $session = new Session;
-            if(empty($updateData['userPw'])) {
-                $updateData['userPw'] = $session->isSet('auth')['password'];
-            } else {
-                if(strlen($updateData['userPw']) < 8 || strlen($updateData['userPw']) > 20) {
-                    throw new InvalidParamsException('비밀번호 형식에 맞지 않습니다.');
-                }
-                $updateData['userPw'] = password_hash($updateData['userPw'], PASSWORD_BCRYPT);
-            }
-            if(empty($updateData['userName'])) {
-                throw new InputDataNullException('유저 이름이 공백 입니다.');
-            }
-            if($updateData['userName'] == 'userName') {
-                if (!preg_match("/^[가-힣]{9,}$/", $updateData['userName'])) {
-                    throw new InvalidParamsException('올바른 이름의 형태가 아닙니다.');
-                }
-            }
-
-
-            // DB connect
-            $db = new Database;
-            $db->pdo->beginTransaction();
-
-            if(!$db->update('tr_account', $this->rule(), ['no' => $_SESSION['auth']['no']], $updateData)) {
-                throw new CustomException('정보 수정에 실패했습니다.');
-            }
-            $db->pdo->commit();
-
-            $afterUserData = $db->findOne('tr_account', ['no' => 'no'], ['no' => $_SESSION['auth']['no']]);
-            $session->setSession('auth', $afterUserData);
-            $session->setSession('success', '정보 수정이 완료 되었습니다.');
-            header('Location: /');
-            exit();
-
-
-        } catch (InvalidParamsException $e) {
-            $e->setErrorMessages($e);
-        } catch (InputDataNullException $e) {
-            $e->setErrorMessages($e);
-        } catch (CustomException $e) {
-            $db->pdo->rollBack();
-            $e->setErrorMessages($e);
-        } catch (Exception $e) {
-            $session->setSession('error', $e->getMessage());
-        }
     }
 
 

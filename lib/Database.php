@@ -27,52 +27,43 @@ class Database
     }
 
 
-    public function save($tableName, $rule, $data)
+    public function save($tableName, $params)
     {
         try {
-            // db 컬럼값 추출, 실제 들어온 데이터 이름
-            $dbValueName = $realName = [];
+            $columns = array_keys($params);
+            $sqlValue = array_map(fn($attr) => ":$attr", $columns);
 
-            foreach ($rule as $key => $value) {
-                $dbValueName[] = $value;
-                $realName[] = $key;
+            $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(',', $columns).") VALUE (".implode(',', $sqlValue).")");
+
+            foreach ($columns as $item) {
+                $statement->bindValue(":$item", $params[$item]);
             }
 
-            // transaction 알아보고 적용할것
-            // try catch 문도 적절히 사용할 것
-            // query 각각 컬럼명 바인딩 준비
-            $params = array_map(fn($attr) => ":$attr", $realName);
-            
-            $statement = $this->pdo->prepare("INSERT INTO $tableName (" . implode(',', $dbValueName) . ")
-                                    VALUE (" . implode(',', $params) . ")");
-            foreach ($realName as $item) {
-                $statement->bindValue(":$item", $data[$item]);
-            }
             $statement->execute();
 
-            // sql 문이 성공 했으면 1 반환
+            // sql 문이 성공하면 1반환
             $result = $statement->rowCount();
-            if ($result == 0) {
+
+            if($result == 0) {
                 throw new Exception();
             }
-            
-            // insert 된 AI Index 가져오기
+
             return $this->pdo->lastInsertId();
 
         } catch (\Exception $e) {
-            return false;
+            return $e;
         }
     }
 
 
-    public function findOne($tableName, $where, $params)
+    public function findOne($tableName, $params)
     {
         try {
-
-            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+            $sqlWhere = array_keys($params);
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $sqlWhere));
 
             $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
-            foreach ($where as $item) {
+            foreach ($sqlWhere as $item) {
                 $statement->bindValue(":$item", $params[$item]);
             }
 
@@ -105,44 +96,41 @@ class Database
     }
 
 
-    public function update($tableName, $rule, $where, $params)
+    public function update ($tableName, $where, $params)
     {
         try {
+            $setValue = implode(' , ', array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
 
-            $sql = implode(" , ", array_map(fn($attr) => "$attr = :$attr", $rule));
+            $setValue = $setValue.', updated = :updated';
 
-            $sql = $sql.", updated = :updated";
+            $setWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($where)));
 
-            $whereKey = array_keys($where);
-            $sqlWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $whereKey));
+            $statement = $this->pdo->prepare("UPDATE $tableName SET $setValue WHERE $setWhere");
 
-            $statement = $this->pdo->prepare("UPDATE $tableName SET $sql WHERE $sqlWhere");
-
-            // value
-            foreach ($rule as $key => $item) {
-                $statement->bindValue(":$item", $params[$key]);
+            // value bind
+            foreach ($params as $key => $value) {
+                $statement->bindValue(":$key", $value);
             }
 
-            // update 날짜
+            // updated Date
             $date = new DateTime("NOW");
             $timeStamp = $date->format('Y-m-d H:i:s');
-            $statement->bindValue(":updated", $timeStamp);
+            $statement->bindValue(':updated', $timeStamp);
 
-
-            // where
-            foreach ($where as $whereKey => $whereItem) {
-                $statement->bindValue(":$whereKey", $whereItem);
+            // where bind
+            foreach ($where as $key => $value) {
+                $statement->bindValue(":$key", $value);
             }
+
             $statement->execute();
 
-            // sql 문이 성공 했으면 1 반환
+            // result 1 success
             $result = $statement->rowCount();
 
-            // update 실패시 롤백
             if($result == 0) {
                 throw new Exception();
             }
-            
+
             return true;
         } catch (Exception $e) {
             return false;
@@ -175,26 +163,4 @@ class Database
             return false;
         }
     }
-
-
-    public function selectJoin($firstTable, $secTable, $joinQuery, $params)
-    {
-        try {
-            $where = array_keys($params);
-
-            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
-
-            $statement = $this->pdo->prepare("SELECT * FROM $firstTable LEFT JOIN $secTable ON $joinQuery WHERE $sql");
-            foreach ($where as $item) {
-                $statement->bindValue(":$item", $params[$item]);
-            }
-            $statement->execute();
-            return $statement->fetchAll();
-
-        } catch (Exception $e) {
-            var_dump($e->getMessage());
-//            return false;
-        }
-    }
-
 }

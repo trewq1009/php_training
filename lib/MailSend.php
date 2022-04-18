@@ -72,7 +72,7 @@ class MailSend
     public function getLink($userNo)
     {
         $crypt = password_hash($userNo, PASSWORD_BCRYPT);
-        return APP_SITE.'/view/account.php?training='.$userNo.'&hash='.$crypt;
+        return APP_SITE.'/view/mail/account.php?training='.$userNo.'&hash='.$crypt;
     }
 
 

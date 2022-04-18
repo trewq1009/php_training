@@ -1,19 +1,13 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
-use app\lib\User;
 
-$userId = '';
-$userName = '';
-$userEmail = '';
-
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
-    $userId = $_POST['userId'];
-    $userName = $_POST['userName'];
-    $userEmail = $_POST['userEmail'];
-    (new User)->register($_POST);
+if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
+    $userId = $_GET['userId'] ?? '';
+    $userName = $_GET['userName'] ?? '';
+    $userEmail = $_GET['userEmail'] ?? '';
 }
 
 ?>
@@ -25,7 +19,7 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'post') {
         <?php endif; ?>
 
 
-        <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="post" id="methodForm">
+        <form action='<?php echo htmlspecialchars('./register_action.php');?>' method="post" id="methodForm">
             <div class="mb-3">
                 <label for="userId" class="form-label">ID</label>
                 <input type="text" class="form-control" value="<?php echo $userId ?>" name="userId" id="userId" required>
