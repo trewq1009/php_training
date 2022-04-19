@@ -8,7 +8,7 @@ use app\lib\Session;
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
     $board = new Board;
     if(isset($_GET['viewUser'])) {
-        $url = sprintf('/view/imi/user_detail.php?user=%s', $_GET['viewUser']);
+        $url = sprintf('/view/admin/user_detail.php?user=%s', $_GET['viewUser']);
         header("Location: $url");
     } else {
         $board->listUp($_SERVER['REQUEST_URI'], $_GET);

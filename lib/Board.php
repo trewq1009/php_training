@@ -30,7 +30,7 @@ class Board
         $url = explode('/', $url);
         $this->url = end($url);
 
-        $resultArr = (new Database)->list($this->rule()[$this->url], $this->page);
+        $resultArr = (new Database)->list('tr_account', $this->page, []);
 
         // page list
         $this->listHtml = (new Field)->userList($resultArr['listData']);
@@ -38,7 +38,7 @@ class Board
         // page button
         unset($resultArr['listData']);
         $resultArr['page'] = $this->page;
-        $this->listBtn = (new Field)->listBtn($resultArr);
+        $this->listBtn = Field::listBtn($resultArr);
     }
 
 
@@ -49,7 +49,7 @@ class Board
             $userList = $db->findAll('tr_mileage_use_log', ['status', 'method'], ['status'=>'AWAIT', 'method'=>'withdrawal']);
 
             foreach ($userList as $key => $value) {
-                $userInfo = $db->findOne('tr_account', ['no'], ['no' => $value['user_no']]);
+                $userInfo = $db->findOne('tr_account', ['no' => $value['user_no']]);
                 $userList[$key]['name'] = $userInfo['name'];
                 $userList[$key]['id'] = $userInfo['id'];
                 $userList[$key]['status'] = '출금신청';

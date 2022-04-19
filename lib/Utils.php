@@ -1,6 +1,8 @@
 <?php
 namespace app\lib;
 
+use Exception;
+
 require_once $_SERVER['DOCUMENT_ROOT'].'/config/config.php';
 
 class Utils
@@ -28,6 +30,49 @@ class Utils
         $decrypted = openssl_decrypt(base64_decode($msg), 'aes-256-cbc', $password, OPENSSL_RAW_DATA, $iv);
 
         return $decrypted;
+    }
+
+
+    public static function fileUpload($fileData)
+    {
+        try {
+
+            // 임시 저장소
+            $tempFile = $fileData['imageInfo']['tmp_name'];
+            // 파일타입 및 확장자 가져오기
+            $fileTypeExt = explode('/', $fileData['imageInfo']['type']);
+
+            $fileType = $fileTypeExt[0];
+            $fileExt = $fileTypeExt[1];
+
+            if(!$fileType == 'image') {
+                throw new Exception('이미지 파일이 아닙니다.');
+            }
+            if(!array_search($fileExt, ['jpeg','jpg','gif','bmp','png'])) {
+                throw new Exception('알맞은 확장자가 아닙니다.');
+            }
+
+            // 시간을 월,일,시,분,초 로 표기
+            $fileDate = date('mdhis', time());
+
+            $newImageName = chr(rand(97,122)).chr(rand(97,122)).$fileDate.$_SESSION['auth']['no'].".$fileExt";
+
+            // 임시 저장소에서 이동할 경로와 파일 명
+            $fileRoot = $_SERVER['DOCUMENT_ROOT']."/upload/$newImageName";
+
+            $imageUpload = move_uploaded_file($tempFile, $fileRoot);
+
+            if(!$imageUpload) {
+                throw new Exception('파일 저장에 실패했습니다.');
+            }
+
+            chmod($fileRoot,0777);
+
+            return $newImageName;
+
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
 

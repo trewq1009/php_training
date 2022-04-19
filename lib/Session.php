@@ -5,17 +5,17 @@ class Session
 {
     public static function setSession($sessionName, $sessionValue)
     {
-        if(isset($_SESSION["$sessionName"])) {
+        if(isset($_SESSION[$sessionName])) {
             self::removeSession($sessionName);
         }
-        $_SESSION["$sessionName"] = $sessionValue;
+        $_SESSION[$sessionName] = $sessionValue;
     }
 
 
     public static function removeSession($sessionName)
     {
-        if(isset($_SESSION["$sessionName"])) {
-            unset($_SESSION["$sessionName"]);
+        if(isset($_SESSION[$sessionName])) {
+            unset($_SESSION[$sessionName]);
         }
     }
 

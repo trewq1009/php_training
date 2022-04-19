@@ -33,7 +33,7 @@ class Database
             $columns = array_keys($params);
             $sqlValue = array_map(fn($attr) => ":$attr", $columns);
 
-            $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(',', $columns).") VALUE (".implode(',', $sqlValue).")");
+            $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(' , ', $columns).") VALUE (".implode(',', $sqlValue).")");
 
             foreach ($columns as $item) {
                 $statement->bindValue(":$item", $params[$item]);
@@ -138,17 +138,25 @@ class Database
     }
 
 
-    public function list($tableName, $page)
+    public function list($tableName, $page, $where)
     {
         try {
             $resultOnPage = 5;                                    // 화면에 보여질 갯수
             $calcPage = $resultOnPage * (intval($page) - 1);     // 데이터 시작점
 
-            $statement = $this->pdo->prepare("SELECT COUNT(*) AS count FROM $tableName");
+            $whereSql='';
+            if(!empty($where)) {
+                foreach ($where as $key => $value) {
+                    $whereSql .= "$key = '$value' AND ";
+                }
+            }
+            $whereSql .= "(status = 'ALIVE' OR status = 'AWAIT')";
+
+            $statement = $this->pdo->prepare("SELECT COUNT(*) AS count FROM $tableName WHERE $whereSql");
             $statement->execute();
             $total = $statement->fetch();                           // 데이터 총 갯수
 
-            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE status = 'ALIVE' OR status = 'AWAIT' ORDER BY no DESC LIMIT $calcPage, $resultOnPage");
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $whereSql ORDER BY no DESC LIMIT $calcPage, $resultOnPage");
             $statement->execute();
             $listData = $statement->fetchAll();
 
@@ -160,7 +168,7 @@ class Database
             ];
 
         } catch (\Exception $e) {
-            return false;
+            return $e;
         }
     }
 }

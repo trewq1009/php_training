@@ -14,14 +14,14 @@ if(!session_id()) {
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/imi/admin.php">Home</a>
+                        <a class="nav-link" href="/view/admin/admin.php">Home</a>
                     </li>
                     <?php if((new Session)->isSet('auth')): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/imi/user_list.php">Users</a>
+                        <a class="nav-link" href="/view/admin/user_list.php">Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/imi/withdrawal_list.php">Withdrawal List</a>
+                        <a class="nav-link" href="/view/admin/withdrawal_list.php">Withdrawal List</a>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -35,7 +35,7 @@ if(!session_id()) {
                 <?php else: ?>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/imi/login.php">Login</a>
+                        <a class="nav-link" href="/view/admin/login.php">Login</a>
                     </li>
 <!--                    <li class="nav-item">-->
 <!--                        <a class="nav-link" href="/">관리자 등록</a>-->

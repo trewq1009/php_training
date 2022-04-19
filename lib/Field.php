@@ -65,7 +65,7 @@ class Field
     }
 
 
-    public function listBtn($data)
+    public static function listBtn($data)
     {
         $btnHtml = '<nav aria-label="Page navigation example"><ul class="pagination">';
         if(ceil($data['total'] / $data['resultOnPage']) > 0) {

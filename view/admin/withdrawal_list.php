@@ -7,7 +7,7 @@ use app\lib\Board;
 
 if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
     if(isset($_GET['viewDetail'])) {
-        $url = sprintf('/view/imi/withdrawal_detail.php?info=%s', $_GET['viewDetail']);
+        $url = sprintf('/view/admin/withdrawal_detail.php?info=%s', $_GET['viewDetail']);
         header("Location: $url");
         exit();
     }

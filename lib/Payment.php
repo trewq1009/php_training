@@ -502,20 +502,20 @@ class Payment
 
             $db->pdo->commit();
             (new Session)->setSession('success', '회원의 출금 신청을 완료하였습니다.');
-            header('Location: /view/imi/withdrawal_list.php');
+            header('Location: /view/admin/withdrawal_list.php');
 
 
 
         } catch (InvalidParamsException $e) {
             $e->setErrorMessages($e);
-            header('Location: /view/imi/withdrawal_list.php');
+            header('Location: /view/admin/withdrawal_list.php');
         } catch (InputDataNullException $e) {
             $e->setErrorMessages($e);
-            header('Location: /view/imi/withdrawal_list.php');
+            header('Location: /view/admin/withdrawal_list.php');
         } catch (DatabaseException $e) {
             $db->pdo->rollBack();
             $e->setErrorMessages($e);
-            header('Location: /view/imi/withdrawal_list.php');
+            header('Location: /view/admin/withdrawal_list.php');
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }

@@ -1,24 +1,22 @@
-﻿-- tr_account_admin Table Create SQL
-CREATE TABLE tr_account_admin
+﻿-- tr_image Table Create SQL
+CREATE TABLE tr_image
 (
-    `no`          BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `id`          VARCHAR(20)     NOT NULL    COMMENT '아이디',
-    `password`    VARCHAR(255)    NOT NULL    COMMENT '패스워드',
-    `name`        VARCHAR(10)     NOT NULL    COMMENT '관리자명',
-    `authority`   CHAR(1)         NOT NULL    DEFAULT '0' COMMENT '권한(0:최고)',
-    `status`      CHAR(5)         NOT NULL    DEFAULT 'ALIVE' COMMENT '계정 상태',
-    `registered`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록 일자',
-    `updated`     TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+    `no`                 BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `image_name`         VARCHAR(255)    NOT NULL    COMMENT '이미지 이름',
+    `image_path`         CHAR(15)        NOT NULL    COMMENT '이미지 경로',
+    `status`             CHAR(5)         NOT NULL    DEFAULT 'ALIVE' COMMENT '활성화(ALIVE), 삭제(DEAD)',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
+    `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 
-ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
+ALTER TABLE tr_image COMMENT '이미지 테이블';
 
-CREATE INDEX IX_tr_account_admin_1
-    ON tr_account_admin(id);
+CREATE INDEX IX_tr_image_1
+    ON tr_image(image_name, image_path);
 
-CREATE UNIQUE INDEX UQ_tr_account_admin_1
-    ON tr_account_admin(id);
+CREATE UNIQUE INDEX UQ_tr_image_1
+    ON tr_image(image_name);
 
 
 -- tr_account Table Create SQL
@@ -46,6 +44,70 @@ CREATE UNIQUE INDEX UQ_tr_account_2
 
 CREATE UNIQUE INDEX UQ_tr_account_1
     ON tr_account(id);
+
+
+-- tr_product Table Create SQL
+CREATE TABLE tr_product
+(
+    `no`                 BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            BIGINT          NOT NULL    COMMENT '등록한 유저 PK',
+    `image_no`           BIGINT          NOT NULL    COMMENT '이미지 테이블 PK',
+    `name`               VARCHAR(20)     NOT NULL    COMMENT '상품명',
+    `information`        VARCHAR(100)    NOT NULL    COMMENT '상품 설명',
+    `before_price`       CHAR(9)         NOT NULL    COMMENT '상품 가격(최대 : 999999999)',
+    `commission`         CHAR(9)         NOT NULL    DEFAULT '0' COMMENT '수수료',
+    `after_price`        CHAR(9)         NOT NULL    COMMENT '수수료 적용 가격',
+    `count`              CHAR(2)         NOT NULL    COMMENT '상품 갯수',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
+    `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_product COMMENT '상품 테이블';
+
+CREATE INDEX IX_tr_product_1
+    ON tr_product(user_no);
+
+ALTER TABLE tr_product
+    ADD CONSTRAINT FK_tr_product_user_no_tr_account_no FOREIGN KEY (user_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_product
+    ADD CONSTRAINT FK_tr_product_image_no_tr_image_no FOREIGN KEY (image_no)
+        REFERENCES tr_image (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tr_board Table Create SQL
+CREATE TABLE tr_board
+(
+    `no`                 BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            BIGINT          NOT NULL    COMMENT '등록한 유저 PK',
+    `image_no`           BIGINT          NOT NULL    COMMENT '이미지 테이블 PK',
+    `title`              VARCHAR(20)     NOT NULL    COMMENT '게시글 제목',
+    `content`            VARCHAR(100)    NOT NULL    COMMENT '게시글 내용',
+    `board_type`         CHAR(10)        NOT NULL    COMMENT '게시물 타입(default:일반, trad:거래, event:이벤트, note:공지 등등)',
+    `reference_no`       BIGINT          NULL        COMMENT '참조 테이블 PK',
+    `status`             CHAR(5)         NOT NULL    COMMENT '활성화(ALIVE), 임시 저장(AWAIT), 삭제(DEAD)',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
+    `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_board COMMENT '게시물 테이블';
+
+CREATE INDEX IX_tr_board_2
+    ON tr_board(board_type, status);
+
+CREATE INDEX IX_tr_board_1
+    ON tr_board(user_no, board_type, status);
+
+ALTER TABLE tr_board
+    ADD CONSTRAINT FK_tr_board_user_no_tr_account_no FOREIGN KEY (user_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_board
+    ADD CONSTRAINT FK_tr_board_image_no_tr_image_no FOREIGN KEY (image_no)
+        REFERENCES tr_image (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 
 -- tr_mileage Table Create SQL
@@ -145,3 +207,68 @@ ALTER TABLE tr_mileage_log
     ADD CONSTRAINT FK_tr_mileage_log_user_no_tr_account_no FOREIGN KEY (user_no)
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
+
+-- tr_account_admin Table Create SQL
+CREATE TABLE tr_account_admin
+(
+    `no`          BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `id`          VARCHAR(20)     NOT NULL    COMMENT '아이디',
+    `password`    VARCHAR(255)    NOT NULL    COMMENT '패스워드',
+    `name`        VARCHAR(10)     NOT NULL    COMMENT '관리자명',
+    `authority`   CHAR(1)         NOT NULL    DEFAULT '0' COMMENT '권한(0:최고)',
+    `status`      CHAR(5)         NOT NULL    DEFAULT 'ALIVE' COMMENT '계정 상태',
+    `registered`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록 일자',
+    `updated`     TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
+
+
+-- tr_trad_log Table Create SQL
+CREATE TABLE tr_trad_log
+(
+    `no`               BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `trad_board_no`    BIGINT       NOT NULL    COMMENT '거래 글 PK',
+    `trad_product_no`  BIGINT       NOT NULL    COMMENT '상품 PK',
+    `seller_no`        BIGINT       NOT NULL    COMMENT '판매자 PK',
+    `buyer`            BIGINT       NOT NULL    COMMENT '구매자 PK',
+    `trad_price`       CHAR(9)      NOT NULL    COMMENT '거래 가격',
+    `status`           CHAR(5)      NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
+    `requested_at`     TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
+    `updated`          TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+     PRIMARY KEY (no)
+);
+
+ALTER TABLE tr_trad_log COMMENT '거래 로그 테이블';
+
+CREATE INDEX IX_tr_trad_log_3
+    ON tr_trad_log(seller_no, status);
+
+CREATE INDEX IX_tr_trad_log_1
+    ON tr_trad_log(trad_board_no, seller_no);
+
+CREATE INDEX IX_tr_trad_log_4
+    ON tr_trad_log(trad_board_no, status);
+
+CREATE INDEX IX_tr_trad_log_2
+    ON tr_trad_log(trad_product_no, seller_no);
+
+CREATE INDEX IX_tr_trad_log_5
+    ON tr_trad_log(trad_product_no, status);
+
+ALTER TABLE tr_trad_log
+    ADD CONSTRAINT FK_tr_trad_log_trad_board_no_tr_board_no FOREIGN KEY (trad_board_no)
+        REFERENCES tr_board (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_trad_log
+    ADD CONSTRAINT FK_tr_trad_log_trad_product_no_tr_product_no FOREIGN KEY (trad_product_no)
+        REFERENCES tr_product (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_trad_log
+    ADD CONSTRAINT FK_tr_trad_log_seller_no_tr_account_no FOREIGN KEY (seller_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tr_trad_log
+    ADD CONSTRAINT FK_tr_trad_log_buyer_tr_account_no FOREIGN KEY (buyer)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;

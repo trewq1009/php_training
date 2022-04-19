@@ -86,7 +86,7 @@ try {
 
 
     $db->pdo->commit();
-    (new Session)->setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
+    Session::setSession('success', '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.');
     header('Location: /');
     exit();
 
@@ -102,7 +102,7 @@ try {
     $preUrl = explode('?', $preUrl)[0];
     header("Location: $preUrl?$query");
 } catch (\Exception $e) {
-    (new Session)->setSession('error', $e->getMessage());
+    Session::setSession('error', $e->getMessage());
     $query = '';
     foreach ($inputTagValue as $key => $value) {
         $query .= "$key=$value&";

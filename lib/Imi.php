@@ -34,7 +34,7 @@ class Imi
 
 
             (new Session)->setSession('auth', $userData);
-            header('Location: /view/imi/admin.php');
+            header('Location: /view/admin/admin.php');
             exit();
 
         } catch (Exception $e) {
@@ -60,7 +60,7 @@ class Imi
             exit();
         }
         $this->session->setSession('success', '정보 수정에 성공했습니다.');
-        header('Location: /view/imi/user_list.php');
+        header('Location: /view/admin/user_list.php');
         exit();
     }
 
@@ -73,7 +73,7 @@ class Imi
             exit();
         }
         $this->session->setSession('success', '회원 탈퇴에 성공하였습니다.');
-        header('Location: /view/imi/user_list.php');
+        header('Location: /view/admin/user_list.php');
         exit();
     }
 

@@ -19,7 +19,7 @@ $auth = $_SESSION['auth'] ?? false;
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/view/trad.php">Trade</a>
+                        <a class="nav-link" href="/view/trad/list.php">Trade</a>
                     </li>
                 </ul>
 
