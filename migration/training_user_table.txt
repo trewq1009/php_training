@@ -232,7 +232,7 @@ CREATE TABLE tr_trad_log
     `trad_board_no`    BIGINT       NOT NULL    COMMENT '거래 글 PK',
     `trad_product_no`  BIGINT       NOT NULL    COMMENT '상품 PK',
     `seller_no`        BIGINT       NOT NULL    COMMENT '판매자 PK',
-    `buyer`            BIGINT       NOT NULL    COMMENT '구매자 PK',
+    `buyer_no`         BIGINT       NOT NULL    COMMENT '구매자 PK',
     `trad_price`       CHAR(9)      NOT NULL    COMMENT '거래 가격',
     `status`           CHAR(5)      NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
     `requested_at`     TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',

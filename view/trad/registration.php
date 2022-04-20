@@ -21,8 +21,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">가격</span>
             <input type="text" class="form-control" id="priceValue" name="productPrice" placeholder="1000원 이상" onKeyup="this.value=this.value.replace(/[^-0-9]/g,'');" onchange="priceCommission(this)" required>
-            <span class="input-group-text" id="basic-addon1">갯수</span>
-            <input type="text" class="form-control" name="productCount" required>
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">실가격</span>
@@ -48,12 +46,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 <script>
     function priceCommission(event) {
         const price = event.value;
-        const commission = 5;
+        const commission = 0.05;
         let commissionPrice = 0;
         if(price < 1000) {
             return;
         }
-        commissionPrice = (price/100) * commission;
+        commissionPrice = price * commission;
         document.querySelector('#commission').value = commissionPrice;
         document.querySelector('#realPrice').value = price - commissionPrice;
     }

@@ -46,7 +46,7 @@ class Board
     {
         try {
             $db = new Database;
-            $userList = $db->findAll('tr_mileage_use_log', ['status', 'method'], ['status'=>'AWAIT', 'method'=>'withdrawal']);
+            $userList = $db->findAll('tr_mileage_use_log', ['status'=>'AWAIT', 'method'=>'withdrawal']);
 
             foreach ($userList as $key => $value) {
                 $userInfo = $db->findOne('tr_account', ['no' => $value['user_no']]);

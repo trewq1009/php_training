@@ -9,7 +9,7 @@ try {
     if(empty($_GET['no'])) {
         throw new Exception('잘못된 경로 입니다.');
     }
-    $list = (new Database)->findAll('tr_mileage_log', ['user_no'], ['user_no' => $_GET['no']]);
+    $list = (new Database)->findAll('tr_mileage_log', ['user_no' => $_GET['no']]);
 
 } catch (Exception $e) {
     Session::setSession('error', $e->getMessage());

@@ -6,28 +6,34 @@ use app\lib\Database;
 use app\lib\Session;
 use app\lib\Utils;
 use app\lib\exception\DatabaseException;
+use app\lib\exception\CustomException;
 
 // db connect
 $db = new Database;
 try {
     $preUrl = $_SERVER['HTTP_REFERER'];
+    $commission = 0.05;
 
-    if (empty($_POST['boardName']) || empty($_POST['productName']) || empty($_POST['productPrice']) || empty($_POST['productCount'])
+    if (empty($_POST['boardName']) || empty($_POST['productName']) || empty($_POST['productPrice'])
         || empty($_POST['productRealPrice']) || empty($_POST['productCommission']) || empty($_POST['productInformation'])) {
         throw new Exception('필수 데이터를 입력해 주세요');
     }
     if ($_POST['productPrice'] < 1000) {
         throw new Exception('최소 금액은 1000원 입니다.');
     }
-    if($_POST['productCount'] > 99 || $_POST['productCount'] < 0) {
-        throw new Exception('수량을 다시 설정해 주세요.');
-    }
     if (!preg_match("/^[0-9]/i", $_POST['productPrice'])) {
         throw new Exception('숫자만 입력해 주세요');
     }
-    if (!preg_match("/^[0-9]/i", $_POST['productCount'])) {
-        throw new Exception('숫자만 입력해 주세요');
+
+    // 금액 Validation
+    $commissionPrice = $_POST['productPrice'] * $commission;
+    if($commissionPrice != $_POST['productCommission']) {
+        throw new CustomException('기입된 정보가 다릅니다.');
     }
+    if($_POST['productRealPrice'] != $_POST['productPrice'] - $commissionPrice) {
+        throw new CustomException('기입된 가격 정보가 다릅니다.');
+    }
+
 
 
     if ($_FILES['imageInfo']['name']) {
@@ -51,14 +57,14 @@ try {
 
     // product DB insert
     $productNo = $db->save('tr_product', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'name'=>$_POST['productName'], 'information'=>$_POST['productInformation'],
-                        'before_price'=>$_POST['productPrice'], 'commission'=>$_POST['productCommission'], 'after_price'=>$_POST['productRealPrice'], 'count'=>$_POST['productCount']]);
+                        'before_price'=>$_POST['productPrice'], 'commission'=>$_POST['productCommission'], 'after_price'=>$_POST['productRealPrice']]);
     if(!$productNo) {
         throw new DatabaseException('상품 저장에 실패 했습니다.');
     }
 
     // board DB insert
     $boardNo = $db->save('tr_board', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'board_type'=>'trad', 'reference_no'=>$productNo]);
+                        'board_type'=>'trad', 'reference_no'=>$productNo, 'status'=>'ALIVE']);
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }
@@ -66,11 +72,14 @@ try {
     $db->pdo->commit();
     header('Location: /view/trad/list.php');
 
+
+} catch (CustomException $e) {
+    $e->setErrorMessages($e);
+    header('Location: /view/trad/list.php');
 } catch (DatabaseException $e) {
-    var_dump($e->getMessage());
-//    $db->pdo->rollBack();
-//    $e->setErrorMessages($e);
-//    header('Location: /view/trad/list.php');
+    $db->pdo->rollBack();
+    $e->setErrorMessages($e);
+    header('Location: /view/trad/list.php');
 } catch (Exception $e) {
     Session::setSession('error', $e->getMessage());
     $query = '';

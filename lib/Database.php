@@ -51,7 +51,7 @@ class Database
             return $this->pdo->lastInsertId();
 
         } catch (\Exception $e) {
-            return $e;
+            return false;
         }
     }
 
@@ -76,15 +76,34 @@ class Database
     }
 
 
-    public function findAll($tableName, $where, $params)
+    public function findAll($tableName, $params)
     {
         try {
 
-            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $where));
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
 
             $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
-            foreach ($where as $item) {
-                $statement->bindValue(":$item", $params[$item]);
+            foreach ($params as $key => $item) {
+                $statement->bindValue(":$key", $item);
+            }
+
+            $statement->execute();
+            return $statement->fetchAll();
+
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+
+    public function findOr($tableName, $params)
+    {
+        try {
+            $sql = implode(" OR ", array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
+
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
+            foreach ($params as $key => $item) {
+                $statement->bindValue(":$key", $item);
             }
 
             $statement->execute();
