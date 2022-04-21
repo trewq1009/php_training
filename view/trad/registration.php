@@ -49,11 +49,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
         const commission = 0.05;
         let commissionPrice = 0;
         if(price < 1000) {
+            alert('1000원 이상에 금액만 가능 합니다.');
             return;
         }
         commissionPrice = price * commission;
-        document.querySelector('#commission').value = commissionPrice;
-        document.querySelector('#realPrice').value = price - commissionPrice;
+        document.querySelector('#commission').value = Math.floor(commissionPrice);
+        document.querySelector('#realPrice').value = Math.ceil(price - commissionPrice);
     }
 </script>
 </html>

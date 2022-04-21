@@ -76,16 +76,17 @@ try {
 
     // 수수료 작업
     $commissionPrice = $tradLogData['trad_price'] * 0.05;
+    $realPrice = ceil($tradLogData['trad_price'] - $commissionPrice);
 
     $sellerMileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$sellerData['user_no'], 'method'=>'trad', 'method_no'=>$_POST['tradNo'], 'before_mileage'=>$sellerData['use_mileage'],
-                                            'use_mileage'=>$commissionPrice, 'after_mileage'=>$sellerData['use_mileage'] + $commissionPrice]);
+                                            'use_mileage'=>$realPrice, 'after_mileage'=>$sellerData['use_mileage'] + $realPrice]);
 
     if(!$sellerMileageLogNo) {
         throw new DatabaseException('작업에 실패하였습니다.');
     }
 
-    $sellerMileageBoolean = $db->update('tr_mileage', ['user_no'=>$sellerData['user_no']], ['use_mileage'=>$sellerData['use_mileage'] + $tradLogData['trad_price'],
-                                            'real_mileage'=>$sellerData['use_mileage'] + $tradLogData['trad_price']]);
+    $sellerMileageBoolean = $db->update('tr_mileage', ['user_no'=>$sellerData['user_no']], ['use_mileage'=>$sellerData['use_mileage'] + $realPrice,
+                                            'real_mileage'=>$sellerData['use_mileage'] + $realPrice]);
 
     if(!$sellerMileageBoolean) {
         throw new DatabaseException('작업에 실패하였습니다.');
