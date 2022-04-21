@@ -74,8 +74,11 @@ try {
     // 3-2. 그 다음 해당 유저 마일리지 update
     $sellerData = $db->findOne('tr_mileage', ['user_no'=>$tradLogData['seller_no']]);
 
+    // 수수료 작업
+    $commissionPrice = $tradLogData['trad_price'] * 0.05;
+
     $sellerMileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$sellerData['user_no'], 'method'=>'trad', 'method_no'=>$_POST['tradNo'], 'before_mileage'=>$sellerData['use_mileage'],
-                                            'use_mileage'=>$tradLogData['trad_price'], 'after_mileage'=>$sellerData['use_mileage'] + $tradLogData['trad_price']]);
+                                            'use_mileage'=>$commissionPrice, 'after_mileage'=>$sellerData['use_mileage'] + $commissionPrice]);
 
     if(!$sellerMileageLogNo) {
         throw new DatabaseException('작업에 실패하였습니다.');
