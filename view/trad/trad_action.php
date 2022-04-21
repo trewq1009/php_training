@@ -5,7 +5,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 use app\lib\Database;
 use app\lib\Session;
 use app\lib\exception\DatabaseException;
-use app\lib\exception\CustomException;
 
 try {
     if(!$auth) {
@@ -65,8 +64,9 @@ try {
     // 상대방이 아직 거래중 상태일때 로직 종료
     if(!$mileageFlag) {
         $db->pdo->commit();
-//        header('Location: /');
-        throw new CustomException('작업에 성공하였습니다.');
+        Session::setSession('success', '거래 완료 되었습니다.');
+        header("Location: $preUrl");
+        exit();
     }
 
     // 3. 해당 거래 마일리지 최종 success 면 판매자에게 update
@@ -103,11 +103,8 @@ try {
     $db->pdo->commit();
     Session::setSession('success', '거래 완료 되었습니다.');
     header("Location: $preUrl");
+    exit();
 
-
-} catch (CustomException $e) {
-    Session::setSession('success', $e->getMessage());
-    header("Location: $preUrl");
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);

@@ -56,11 +56,13 @@ class Database
     }
 
 
-    public function findOne($tableName, $params)
+    public function findOne($tableName, $params, $option = '')
     {
         try {
             $sqlWhere = array_keys($params);
             $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $sqlWhere));
+
+            $sql .= " $option";
 
             $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
             foreach ($sqlWhere as $item) {

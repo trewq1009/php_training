@@ -57,7 +57,6 @@ CREATE TABLE tr_product
     `before_price`       CHAR(9)         NOT NULL    COMMENT '상품 가격(최대 : 999999999)',
     `commission`         CHAR(9)         NOT NULL    DEFAULT '0' COMMENT '수수료',
     `after_price`        CHAR(9)         NOT NULL    COMMENT '수수료 적용 가격',
-    `count`              CHAR(2)         NOT NULL    COMMENT '상품 갯수',
     `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
     `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
@@ -228,34 +227,27 @@ ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
 -- tr_trad_log Table Create SQL
 CREATE TABLE tr_trad_log
 (
-    `no`               BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `trad_board_no`    BIGINT       NOT NULL    COMMENT '거래 글 PK',
-    `trad_product_no`  BIGINT       NOT NULL    COMMENT '상품 PK',
-    `seller_no`        BIGINT       NOT NULL    COMMENT '판매자 PK',
-    `buyer_no`         BIGINT       NOT NULL    COMMENT '구매자 PK',
-    `trad_price`       CHAR(9)      NOT NULL    COMMENT '거래 가격',
-    `status`           CHAR(5)      NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
-    `requested_at`     TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
-    `updated`          TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+    `no`                  BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `trad_board_no`       BIGINT       NOT NULL    COMMENT '거래 글 PK',
+    `trad_product_no`     BIGINT       NOT NULL    COMMENT '상품 PK',
+    `seller_no`           BIGINT       NOT NULL    COMMENT '판매자 PK',
+    `seller_trad_status`  CHAR(7)      NOT NULL    DEFAULT 'ongoing' COMMENT '판매자 거래 상태(success:거래 완료, ongoing:거래중)',
+    `buyer_no`            BIGINT       NOT NULL    COMMENT '구매자 PK',
+    `buyer_trad_status`   CHAR(7)      NOT NULL    DEFAULT 'ongoing' COMMENT '구매자 거래 상태(success:거래 완료, ongoing:거래중)',
+    `trad_price`          CHAR(9)      NOT NULL    COMMENT '거래 가격(최대 : 999999999)',
+    `status`              CHAR(7)      NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
+    `requested_at`        TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
+    `updated`             TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 
 ALTER TABLE tr_trad_log COMMENT '거래 로그 테이블';
 
-CREATE INDEX IX_tr_trad_log_3
-    ON tr_trad_log(seller_no, status);
+CREATE INDEX IX_tr_trad_log_2
+    ON tr_trad_log(seller_no, buyer_no);
 
 CREATE INDEX IX_tr_trad_log_1
-    ON tr_trad_log(trad_board_no, seller_no);
-
-CREATE INDEX IX_tr_trad_log_4
-    ON tr_trad_log(trad_board_no, status);
-
-CREATE INDEX IX_tr_trad_log_2
-    ON tr_trad_log(trad_product_no, seller_no);
-
-CREATE INDEX IX_tr_trad_log_5
-    ON tr_trad_log(trad_product_no, status);
+    ON tr_trad_log(trad_board_no);
 
 ALTER TABLE tr_trad_log
     ADD CONSTRAINT FK_tr_trad_log_trad_board_no_tr_board_no FOREIGN KEY (trad_board_no)
@@ -270,5 +262,5 @@ ALTER TABLE tr_trad_log
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE tr_trad_log
-    ADD CONSTRAINT FK_tr_trad_log_buyer_tr_account_no FOREIGN KEY (buyer)
+    ADD CONSTRAINT FK_tr_trad_log_buyer_no_tr_account_no FOREIGN KEY (buyer_no)
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;

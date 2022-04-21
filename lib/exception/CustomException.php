@@ -7,6 +7,6 @@ class CustomException extends \Exception
 {
     // 예외처리 전용 클래스
     public function setErrorMessages($e) {
-        (new Session)->setSession('error', $e->getMessage().$e->getLine());
+        Session::setSession('error', $e->getMessage().$e->getLine());
     }
 }
