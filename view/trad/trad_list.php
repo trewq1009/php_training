@@ -18,9 +18,11 @@ try {
         if($value['seller_no'] == $auth['no']) {
             $listData[$key]['tradName'] = '판매';
             $listData[$key]['traderStatus'] = $value['buyer_trad_status'];
+            $listData[$key]['userStatus'] = $value['seller_trad_status'];
         } else {
             $listData[$key]['tradName'] = '구매';
             $listData[$key]['traderStatus'] = $value['seller_trad_status'];
+            $listData[$key]['userStatus'] = $value['buyer_trad_status'];
         }
     }
 
@@ -32,8 +34,19 @@ try {
 ?>
 
 <section class="container">
+    <?php if((new Session)->isSet('success')): ?>
+        <div class="alert alert-success">
+            <?php echo (new Session)->getFlash('success') ?>
+        </div>
+    <?php elseif((new Session)->isSet('error')): ?>
+        <div class="alert alert-danger">
+            <?php echo (new Session)->getFlash('error') ?>
+        </div>
+    <?php endif; ?>
+
     <form action='<?php echo htmlspecialchars('./trad_action.php');?>' method="post" id="formAction">
         <input type="hidden" id="tradNo" name="tradNo" value="">
+        <input type="hidden" id="tradType" name="tradType" value="">
         <table class="table">
             <thead>
             <tr>
@@ -41,6 +54,7 @@ try {
                 <th scope="col">상품명</th>
                 <th scope="col">가격</th>
                 <th scope="col">상대상태</th>
+                <th scope="col">나의거래상태</th>
                 <th scope="col">최종거래상태</th>
                 <th scope="col">#</th>
             </tr>
@@ -52,6 +66,7 @@ try {
                 <td><?php echo $item['productName'] ?></td>
                 <td><?php echo $item['trad_price'] ?></td>
                 <td><?php echo $item['traderStatus'] ?></td>
+                <td><?php echo $item['userStatus'] ?></td>
                 <td><?php echo $item['status'] ?></td>
                 <td>
                     <button type="button" onclick="tradSuccess(this)" value="<?php echo $item['no'] ?>" data-trad="<?php echo $item['tradName'] ?>" name="tradNo" class="btn btn-outline-info">거래 완료</button>
@@ -69,6 +84,7 @@ try {
         const resultConfirm = window.confirm(tradName + '를 완료 하시겠습니까?');
         if(!resultConfirm) return;
 
+        event.dataset.trad === '판매' ? document.querySelector('#tradType').value = 'seller' : document.querySelector('#tradType').value = 'buyer';
         document.querySelector('#tradNo').value = event.value;
         document.querySelector('#formAction').submit();
     }
