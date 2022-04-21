@@ -32,7 +32,7 @@ try {
         throw new Exception('이메일 인증을 완료하지 않았습니다.');
     }
     // 로그인
-    (new Session)->setSession('auth', ['no'=>$userData['no'], 'name'=>$userData['name']]);
+    Session::setSession('auth', ['no'=>$userData['no'], 'name'=>$userData['name']]);
     header('Location: /');
     exit();
 

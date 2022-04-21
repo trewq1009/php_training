@@ -1,33 +1,36 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/admin/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/admin/header.php';
 
 use app\lib\Session;
-use app\lib\Board;
+use app\lib\Database;
 
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
-    if(isset($_GET['viewDetail'])) {
-        $url = sprintf('/view/admin/withdrawal_detail.php?info=%s', $_GET['viewDetail']);
-        header("Location: $url");
-        exit();
+try {
+    $withdrawalList = (new Database)->findAll('tr_withdrawal_log', ['status'=>'await']);
+    foreach ($withdrawalList as $key => $value) {
+        $userModel = (new Database)->findOne('tr_account', ['no'=>$value['user_no']]);
+        $withdrawalList[$key]['name'] = $userModel['name'];
+        $withdrawalList[$key]['id'] = $userModel['id'];
+        $withdrawalList[$key]['status'] = '출금신청';
     }
 
-    $list = (new Board)->withdrawalList();
+} catch (Exception $e) {
+    echo $e->getMessage();
 }
 ?>
 <section class="container">
 
-    <?php if((new Session)->isSet('success')): ?>
+    <?php if(Session::isSet('success')): ?>
         <div class="alert alert-success">
-            <?php echo (new Session)->getFlash('success') ?>
+            <?php echo Session::getFlash('success') ?>
         </div>
-    <?php elseif((new Session)->isSet('error')): ?>
+    <?php elseif(Session::isSet('error')): ?>
         <div class="alert alert-danger">
-            <?php echo (new Session)->getFlash('error') ?>
+            <?php echo Session::getFlash('error') ?>
         </div>
     <?php endif; ?>
 
-    <form action='<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>' method="get">
+    <form action='<?php echo htmlspecialchars('./withdrawal_detail.php');?>' method="get">
         <table class="table">
             <thead>
             <tr>
@@ -41,13 +44,13 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
             </tr>
             </thead>
             <tbody>
-            <?php if($list): ?>
-                <?php foreach ($list as $item): ?>
+            <?php if($withdrawalList): ?>
+                <?php foreach ($withdrawalList as $item): ?>
                 <tr>
                     <th scope="row"><?php echo $item['user_no'] ?></th>
                     <td><?php echo $item['name'] ?></td>
                     <td><?php echo $item['id'] ?></td>
-                    <td><?php echo $item['use_mileage'] ?></td>
+                    <td><?php echo $item['withdrawal_mileage'] ?></td>
                     <td><?php echo $item['status'] ?></td>
                     <td><?php echo $item['requested_at'] ?></td>
                     <td>

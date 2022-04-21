@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/imi/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/admin/head.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/admin/header.php';
 
 use app\lib\Session;
 
@@ -8,13 +8,13 @@ use app\lib\Session;
 
 
     <section class="container">
-        <?php if((new Session)->isSet('success')): ?>
+        <?php if(Session::isSet('success')): ?>
             <div class="alert alert-success">
-                <?php echo (new Session)->getFlash('success') ?>
+                <?php echo Session::getFlash('success') ?>
             </div>
-        <?php elseif((new Session)->isSet('error')): ?>
+        <?php elseif(Session::isSet('error')): ?>
             <div class="alert alert-danger">
-                <?php echo (new Session)->getFlash('error') ?>
+                <?php echo Session::getFlash('error') ?>
             </div>
         <?php endif; ?>
         <div>

@@ -20,13 +20,13 @@ class Session
     }
 
 
-    public function isSet(string $key)
+    public static function isSet(string $key)
     {
         return $_SESSION[$key] ?? false;
     }
 
 
-    public function getFlash(string $key)
+    public static function getFlash(string $key)
     {
         $message = $_SESSION[$key] ?? false;
         if($message) {

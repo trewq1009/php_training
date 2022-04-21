@@ -6,14 +6,14 @@ use app\lib\Session;
 use app\lib\Utils;
 
 if(!$auth) {
-    (new Session)->setSession('error', '잘못된 경로 입니다.');
+    Session::setSession('error', '잘못된 경로 입니다.');
     header('Location: /');
     exit();
 }
 
 ?>
 <section class="container">
-    <?php if((new Session)->isSet('error')): ?>
+    <?php if(Session::isSet('error')): ?>
         <div class="alert alert-danger">
             <?php echo (new Session)->getFlash('error') ?>
         </div>

@@ -12,9 +12,9 @@ if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
 
 ?>
     <section class="container">
-        <?php if((new Session)->isSet('error')): ?>
+        <?php if(Session::isSet('error')): ?>
             <div class="alert alert-danger">
-                <?php echo (new Session)->getFlash('error') ?>
+                <?php echo Session::getFlash('error') ?>
             </div>
         <?php endif; ?>
 
