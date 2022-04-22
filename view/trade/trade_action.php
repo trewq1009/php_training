@@ -24,7 +24,7 @@ try {
     // 1. 거래 로그 찾아서 스테이터스 값 변경
     // 거래 타입에 따라 상대 거래 상태값도 확인
     // 내가 이미 거래 완료 신청을 했나도 봐야함
-    $tradeLogData = $db->findOne('tr_trade_log', ['no'=>$_POST['tradeNo']]);
+    $tradeLogData = $db->findOne('tr_trade_log', ['no'=>$_POST['tradeNo']], 'FOR UPDATE');
 
     if($tradeLogData[$_POST['tradeType'].'_trade_status'] == 'success') {
         throw new DatabaseException('이미 거래 완료 신청을 했습니다.');
@@ -76,7 +76,7 @@ try {
     // 3. 해당 거래 마일리지 최종 success 면 판매자에게 update
     // 3-1. 거래 성공일시 마일리지 로그 먼저 insert
     // 3-2. 그 다음 해당 유저 마일리지 update
-    $sellerData = $db->findOne('tr_mileage', ['user_no'=>$tradeLogData['seller_no']]);
+    $sellerData = $db->findOne('tr_mileage', ['user_no'=>$tradeLogData['seller_no']], 'FOR UPDATE');
 
     // 수수료 작업
     $commissionPrice = $tradeLogData['trade_price'] * 0.05;
@@ -98,7 +98,7 @@ try {
 
 
     // 4. 거래 완전 확정일때 구매자의 using_mileage 도 사용 처리
-    $buyerData = $db->findOne('tr_mileage', ['user_no'=>$tradeLogData['buyer_no']]);
+    $buyerData = $db->findOne('tr_mileage', ['user_no'=>$tradeLogData['buyer_no']], 'FOR UPDATE');
 
     if(!$db->update('tr_mileage', ['user_no'=>$buyerData['user_no']], ['using_mileage'=>$buyerData['using_mileage'] - $tradeLogData['trade_price']])) {
         throw new DatabaseException('작업에 실패하였습니다.');

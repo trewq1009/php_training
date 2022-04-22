@@ -17,30 +17,35 @@ try {
 
     // DB connect
     $db = new Database;
+    // transaction start
+    $db->pdo->beginTransaction();
 
     // user mileage
-    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$auth['no']]);
+    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'FOR UPDATE');
 
     // mileage validation
     if($userMileageData['use_mileage'] < $_POST['price']) {
-        throw new CustomException('사용할 수 있는 마일리지가 부족합니다. 충전해 주세요');
+        throw new DatabaseException('사용할 수 있는 마일리지가 부족합니다. 충전해 주세요');
     }
 
 
     // board validation
     $boardData = $db->findOne('tr_board', ['no'=>$_POST['boardNo']]);
     if($boardData['reference_no'] != $_POST['productNo']) {
-        throw new Exception('데이터가 변경 되었습니다.');
+        throw new DatabaseException('데이터가 변경 되었습니다.');
     }
 
     // product validation
     $productData = $db->findOne('tr_product', ['no'=>$_POST['productNo']]);
     if($productData['before_price'] != $_POST['price']) {
-        throw new Exception('가격이 변경 되었습니다.');
+        throw new DatabaseException('가격이 변경 되었습니다.');
     }
 
-    // transaction start
-    $db->pdo->beginTransaction();
+    $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$_POST['boardNo']]);
+    if(!empty($tradeLogData)) {
+        throw new DatabaseException('이미 거래가 예정되었습니다.');
+    }
+
 
     // trade log insert
     $tradeLogNo = $db->save('tr_trade_log', ['trade_board_no'=>$_POST['boardNo'], 'trade_product_no'=>$_POST['productNo'], 'seller_no'=>$_POST['seller'],
@@ -79,9 +84,6 @@ try {
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
-    $e->setErrorMessages($e);
-    header('Location: /view/trade/list.php');
-} catch (CustomException $e) {
     $e->setErrorMessages($e);
     header('Location: /view/trade/list.php');
 } catch (Exception $e) {
