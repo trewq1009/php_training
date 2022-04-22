@@ -7,13 +7,13 @@ use app\lib\Session;
 ?>
 
 <section>
-    <?php if((new Session)->isSet('success')): ?>
+    <?php if(Session::isSet('success')): ?>
         <div class="alert alert-success">
-            <?php echo (new Session)->getFlash('success') ?>
+            <?php echo (Session::getFlash('success') ?>
         </div>
-    <?php elseif((new Session)->isSet('error')): ?>
+    <?php elseif(Session::isSet('error')): ?>
         <div class="alert alert-danger">
-            <?php echo (new Session)->getFlash('error') ?>
+            <?php echo Session::getFlash('error') ?>
         </div>
     <?php endif; ?>
 
