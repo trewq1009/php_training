@@ -84,7 +84,7 @@ class Database
 
             $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
 
-            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql ORDER BY no DESC");
             foreach ($params as $key => $item) {
                 $statement->bindValue(":$key", $item);
             }

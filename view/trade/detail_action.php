@@ -42,18 +42,18 @@ try {
     // transaction start
     $db->pdo->beginTransaction();
 
-    // trad log insert
-    $tradLogNo = $db->save('tr_trad_log', ['trad_board_no'=>$_POST['boardNo'], 'trad_product_no'=>$_POST['productNo'], 'seller_no'=>$_POST['seller'],
-                                        'buyer_no'=>$auth['no'], 'trad_price'=>$_POST['price'], 'status'=>'ongoing']);
+    // trade log insert
+    $tradeLogNo = $db->save('tr_trade_log', ['trade_board_no'=>$_POST['boardNo'], 'trade_product_no'=>$_POST['productNo'], 'seller_no'=>$_POST['seller'],
+                                        'buyer_no'=>$auth['no'], 'trade_price'=>$_POST['price'], 'status'=>'ongoing']);
 
-    if(!$tradLogNo) {
+    if(!$tradeLogNo) {
         throw new DatabaseException('로그 저장에 실패했습니다.');
     }
 
     // 차감 금액
     $differenceMileage = $userMileageData['use_mileage'] - $_POST['price'];
     
-    $mileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$auth['no'], 'method'=>'trad', 'method_no'=>$tradLogNo, 'before_mileage'=>$userMileageData['use_mileage'],
+    $mileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$auth['no'], 'method'=>'trade', 'method_no'=>$tradeLogNo, 'before_mileage'=>$userMileageData['use_mileage'],
                                             'use_mileage'=>$_POST['price'], 'after_mileage'=>$differenceMileage]);
 
     if(!$mileageLogNo) {
@@ -75,15 +75,15 @@ try {
     }
 
     $db->pdo->commit();
-    header('Location: /view/trad/trad_list.php');
+    header('Location: /view/trade/trade_list.php');
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header('Location: /view/trad/list.php');
+    header('Location: /view/trade/list.php');
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
-    header('Location: /view/trad/list.php');
+    header('Location: /view/trade/list.php');
 } catch (Exception $e) {
     Session::setSession('error', $e->getMessage());
     header('Location: /');

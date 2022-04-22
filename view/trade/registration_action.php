@@ -64,22 +64,22 @@ try {
 
     // board DB insert
     $boardNo = $db->save('tr_board', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'board_type'=>'trad', 'reference_no'=>$productNo, 'status'=>'ALIVE']);
+                        'board_type'=>'trade', 'reference_no'=>$productNo, 'status'=>'ALIVE']);
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }
 
     $db->pdo->commit();
-    header('Location: /view/trad/list.php');
+    header('Location: /view/trade/list.php');
 
 
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
-    header('Location: /view/trad/list.php');
+    header('Location: /view/trade/list.php');
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header('Location: /view/trad/list.php');
+    header('Location: /view/trade/list.php');
 } catch (Exception $e) {
     Session::setSession('error', $e->getMessage());
     $query = '';

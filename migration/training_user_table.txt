@@ -54,9 +54,9 @@ CREATE TABLE tr_product
     `image_no`           BIGINT          NOT NULL    COMMENT '이미지 테이블 PK',
     `name`               VARCHAR(20)     NOT NULL    COMMENT '상품명',
     `information`        VARCHAR(100)    NOT NULL    COMMENT '상품 설명',
-    `before_price`       CHAR(9)         NOT NULL    COMMENT '상품 가격(최대 : 999999999)',
-    `commission`         CHAR(9)         NOT NULL    DEFAULT '0' COMMENT '수수료',
-    `after_price`        CHAR(9)         NOT NULL    COMMENT '수수료 적용 가격',
+    `before_price`       INT UNSIGNED    NOT NULL    COMMENT '상품 가격',
+    `commission`         INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '수수료',
+    `after_price`        INT UNSIGNED    NOT NULL    COMMENT '수수료 적용 가격',
     `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
     `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
@@ -112,13 +112,13 @@ ALTER TABLE tr_board
 -- tr_mileage Table Create SQL
 CREATE TABLE tr_mileage
 (
-    `no`                 BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`            BIGINT       NOT NULL    COMMENT '유저 PK',
-    `using_mileage`      CHAR(7)      NOT NULL    DEFAULT '0' COMMENT '사용중 마일리지(최대 : 9999999)',
-    `use_mileage`        CHAR(7)      NOT NULL    DEFAULT '0' COMMENT '사용 가능 마일리지(이벤트성 마일리지) : 출금 불가능',
-    `real_mileage`       CHAR(7)      NOT NULL    DEFAULT '0' COMMENT '출금 가능 마일리지(충전&거래 한 마일리지)',
-    `registration_date`  TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '생성 날짜',
-    `updated`            TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 날짜',
+    `no`                 BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            BIGINT          NOT NULL    COMMENT '유저 PK',
+    `using_mileage`      INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '사용중 마일리지',
+    `use_mileage`        INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '사용 가능 마일리지(이벤트성 마일리지) : 출금 불가능',
+    `real_mileage`       INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '출금 가능 마일리지(충전&거래 한 마일리지)',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '생성 날짜',
+    `updated`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 날짜',
      PRIMARY KEY (no)
 );
 
@@ -140,7 +140,7 @@ CREATE TABLE tr_withdrawal_log
 (
     `no`                   BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
     `user_no`              BIGINT          NOT NULL    COMMENT '유저 PK',
-    `withdrawal_mileage`   CHAR(7)         NOT NULL    COMMENT '출금 마일리지(최대 : 9999999)',
+    `withdrawal_mileage`   INT UNSIGNED    NOT NULL    COMMENT '출금 마일리지',
     `bank_name`            VARCHAR(10)     NOT NULL    COMMENT '은행 이름',
     `bank_account_number`  VARCHAR(255)    NOT NULL    COMMENT '은행 계좌 번호',
     `status`               CHAR(7)         NOT NULL    COMMENT '출금 상태(출금완료:success, 대기중:awail, 실패:fail, 취소:cancel)',
@@ -162,14 +162,14 @@ ALTER TABLE tr_withdrawal_log
 -- tr_payment_log Table Create SQL
 CREATE TABLE tr_payment_log
 (
-    `no`                   BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`              BIGINT         NOT NULL    COMMENT '유저 PK',
-    `method`               VARCHAR(10)    NOT NULL    COMMENT '결제 수단(credit:카드, phone:휴대전화, voucher:상품권)',
-    `payment_mileage`      CHAR(7)        NOT NULL    COMMENT '충전 마일리지(최대 : 9999999)',
-    `payment_information`  TEXT           NOT NULL    COMMENT '결제 상세 내역',
-    `status`               CHAR(7)        NOT NULL    COMMENT '결제 상태(성공:success, 실패:fail)',
-    `cancels`              TEXT           NOT NULL    COMMENT '결제 실패 내역',
-    `requested_at`         TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '결제 신청 일자',
+    `no`                   BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`              BIGINT          NOT NULL    COMMENT '유저 PK',
+    `method`               VARCHAR(10)     NOT NULL    COMMENT '결제 수단(credit:카드, phone:휴대전화, voucher:상품권)',
+    `payment_mileage`      INT UNSIGNED    NOT NULL    COMMENT '충전 마일리지',
+    `payment_information`  TEXT            NOT NULL    COMMENT '결제 상세 내역',
+    `status`               CHAR(7)         NOT NULL    COMMENT '결제 상태(성공:success, 실패:fail)',
+    `cancels`              TEXT            NOT NULL    COMMENT '결제 실패 내역',
+    `requested_at`         TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '결제 신청 일자',
      PRIMARY KEY (no)
 );
 
@@ -186,14 +186,14 @@ ALTER TABLE tr_payment_log
 -- tr_mileage_log Table Create SQL
 CREATE TABLE tr_mileage_log
 (
-    `no`                 BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `user_no`            BIGINT         NOT NULL    COMMENT '유저 PK',
-    `method`             VARCHAR(10)    NOT NULL    COMMENT '행동(withdrawal:출금, payment:충전, trad:거래, join:가입)',
-    `method_no`          BIGINT         NULL        COMMENT '관련 테이블 PK',
-    `before_mileage`     CHAR(7)        NOT NULL    DEFAULT '0' COMMENT '이전 마일리지(최대 : 9999999)',
-    `use_mileage`        CHAR(7)        NOT NULL    DEFAULT '0' COMMENT '변동 마일리지',
-    `after_mileage`      CHAR(7)        NOT NULL    DEFAULT '0' COMMENT '변동 후 마일리지',
-    `registration_date`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '변동 일자',
+    `no`                 BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `user_no`            BIGINT          NOT NULL    COMMENT '유저 PK',
+    `method`             VARCHAR(10)     NOT NULL    COMMENT '행동(withdrawal:출금, payment:충전, trad:거래, join:가입)',
+    `method_no`          BIGINT          NULL        COMMENT '관련 테이블 PK',
+    `before_mileage`     INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '이전 마일리지',
+    `use_mileage`        INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '변동 마일리지',
+    `after_mileage`      INT UNSIGNED    NOT NULL    DEFAULT 0 COMMENT '변동 후 마일리지',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '변동 일자',
      PRIMARY KEY (no)
 );
 
@@ -224,43 +224,49 @@ CREATE TABLE tr_account_admin
 ALTER TABLE tr_account_admin COMMENT '관리자 테이블';
 
 
--- tr_trad_log Table Create SQL
-CREATE TABLE tr_trad_log
+-- tr_trade_log Table Create SQL
+CREATE TABLE tr_trade_log
 (
-    `no`                  BIGINT       NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
-    `trad_board_no`       BIGINT       NOT NULL    COMMENT '거래 글 PK',
-    `trad_product_no`     BIGINT       NOT NULL    COMMENT '상품 PK',
-    `seller_no`           BIGINT       NOT NULL    COMMENT '판매자 PK',
-    `seller_trad_status`  CHAR(7)      NOT NULL    DEFAULT 'ongoing' COMMENT '판매자 거래 상태(success:거래 완료, ongoing:거래중)',
-    `buyer_no`            BIGINT       NOT NULL    COMMENT '구매자 PK',
-    `buyer_trad_status`   CHAR(7)      NOT NULL    DEFAULT 'ongoing' COMMENT '구매자 거래 상태(success:거래 완료, ongoing:거래중)',
-    `trad_price`          CHAR(9)      NOT NULL    COMMENT '거래 가격(최대 : 999999999)',
-    `status`              CHAR(7)      NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
-    `requested_at`        TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
-    `updated`             TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
+    `no`                   BIGINT          NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `trade_board_no`       BIGINT          NOT NULL    COMMENT '거래 글 PK',
+    `trade_product_no`     BIGINT          NOT NULL    COMMENT '상품 PK',
+    `seller_no`            BIGINT          NOT NULL    COMMENT '판매자 PK',
+    `seller_trade_status`  CHAR(7)         NOT NULL    DEFAULT 'ongoing' COMMENT '판매자 거래 상태(success:거래 완료, ongoing:거래중)',
+    `buyer_no`             BIGINT          NOT NULL    COMMENT '구매자 PK',
+    `buyer_trade_status`   CHAR(7)         NOT NULL    DEFAULT 'ongoing' COMMENT '구매자 거래 상태(success:거래 완료, ongoing:거래중)',
+    `trade_price`          INT UNSIGNED    NOT NULL    COMMENT '거래 가격',
+    `status`               CHAR(7)         NOT NULL    COMMENT '거래 상태(success:완료, cancel:취소, ongoing:진행중)',
+    `seller_status_date`   TIMESTAMP       NULL        COMMENT '판매자 거래 상태 변경 일자',
+    `buyer_status_date`    TIMESTAMP       NULL        COMMENT '구매자 거래 상태 변경 일자',
+    `trade_success_date`   TIMESTAMP       NULL        COMMENT '거래 성공 일자',
+    `trade_cancel_date`    TIMESTAMP       NULL        COMMENT '거래 취소 일자',
+    `requested_at`         TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
+    `updated`              TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 
-ALTER TABLE tr_trad_log COMMENT '거래 로그 테이블';
+ALTER TABLE tr_trade_log COMMENT '거래 로그 테이블';
 
 CREATE INDEX IX_tr_trad_log_2
-    ON tr_trad_log(seller_no, buyer_no);
+    ON tr_trade_log(seller_no, buyer_no);
 
 CREATE INDEX IX_tr_trad_log_1
-    ON tr_trad_log(trad_board_no);
+    ON tr_trade_log(trade_board_no);
 
-ALTER TABLE tr_trad_log
-    ADD CONSTRAINT FK_tr_trad_log_trad_board_no_tr_board_no FOREIGN KEY (trad_board_no)
+ALTER TABLE tr_trade_log
+    ADD CONSTRAINT FK_tr_trade_log_trade_board_no_tr_board_no FOREIGN KEY (trade_board_no)
         REFERENCES tr_board (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE tr_trad_log
-    ADD CONSTRAINT FK_tr_trad_log_trad_product_no_tr_product_no FOREIGN KEY (trad_product_no)
+ALTER TABLE tr_trade_log
+    ADD CONSTRAINT FK_tr_trade_log_trade_product_no_tr_product_no FOREIGN KEY (trade_product_no)
         REFERENCES tr_product (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE tr_trad_log
-    ADD CONSTRAINT FK_tr_trad_log_seller_no_tr_account_no FOREIGN KEY (seller_no)
+ALTER TABLE tr_trade_log
+    ADD CONSTRAINT FK_tr_trade_log_seller_no_tr_account_no FOREIGN KEY (seller_no)
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE tr_trad_log
-    ADD CONSTRAINT FK_tr_trad_log_buyer_no_tr_account_no FOREIGN KEY (buyer_no)
+ALTER TABLE tr_trade_log
+    ADD CONSTRAINT FK_tr_trade_log_buyer_no_tr_account_no FOREIGN KEY (buyer_no)
         REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+

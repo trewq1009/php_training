@@ -13,7 +13,7 @@ try {
     $boardData = $db->findOne('tr_board', ['no'=>$_GET['boardNo']]);
     $productData = $db->findOne('tr_product', ['no'=>$boardData['reference_no']]);
     $imageData = $db->findOne('tr_image', ['no'=>$productData['image_no']]);
-    $tradLogData = $db->findOne('tr_trad_log', ['trad_board_no'=>$boardData['no']]);
+    $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$boardData['no']]);
 
 } catch (Exception $e) {
     Session::setSession('error', $e->getMessage());
@@ -28,12 +28,12 @@ try {
         <input type="hidden" name="seller" value="<?php echo $boardData['user_no'] ?>">
         <input type="hidden" name="productNo" value="<?php echo $productData['no'] ?>">
         <input type="hidden" name="price" value="<?php echo $productData['before_price'] ?>">
-        <?php if($tradLogData): ?>
-            <?php if($tradLogData['status'] == 'ongoing') : ?>
+        <?php if($tradeLogData): ?>
+            <?php if($tradeLogData['status'] == 'ongoing') : ?>
                 <div style="margin: 0 0 1rem 0">
                     <button type="button" class="btn btn-primary">거래중</button>
                 </div>
-            <?php elseif($tradLogData['status'] == 'success') : ?>
+            <?php elseif($tradeLogData['status'] == 'success') : ?>
                 <div style="margin: 0 0 1rem 0">
                     <button type="button" class="btn btn-primary">거래 완료</button>
                 </div>
@@ -69,7 +69,7 @@ try {
         
         <div class="input-group">
             <span class="input-group-text">상품 설명</span>
-            <p class="form-control" style="margin: 0"><?php echo $boardData['content'] ?></p>
+            <p class="form-control" style="margin: 0"><?php echo nl2br($boardData['content']) ?></p>
         </div>
     </form>
 
