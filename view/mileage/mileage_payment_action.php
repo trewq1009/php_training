@@ -69,7 +69,7 @@ try {
     $db = new Database;
     $db->pdo->beginTransaction();
 
-    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']]);
+    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'FOR UPDATE');
 
     $information = [
         'card_validity' => Utils::encrypt(date("Y-m", strtotime($cardDate))),

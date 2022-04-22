@@ -4,7 +4,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
 use app\lib\Session;
-use app\lib\exception\CustomException;
 use app\lib\exception\DatabaseException;
 
 try {

@@ -36,7 +36,7 @@ try {
 
     $db->pdo->beginTransaction();
 
-    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']]);
+    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'FOR UPDATE');
 
     $withdrawalLogNo = $db->save('tr_withdrawal_log', ['user_no'=>$auth['no'], 'withdrawal_mileage'=>$_POST['drawalMileage'], 'bank_name'=>$_POST['bankValue'],
                         'bank_account_number'=>Utils::encrypt($_POST['bankNumber']), 'status'=>'await']);
