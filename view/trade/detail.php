@@ -9,7 +9,7 @@ try {
     if(empty($_GET['boardNo'])) {
         throw new Exception('잘못된 경로 입니다.');
     }
-    if(empty(!$auth)) {
+    if(!$auth) {
         throw new Exception('로그인 후 이용 가능 합니다.');
     }
     $db = new Database;
