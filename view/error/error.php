@@ -6,17 +6,12 @@ use app\lib\Session;
 
 ?>
 
-<section>
-    <?php if(Session::isSet('success')): ?>
-        <div class="alert alert-success">
-            <?php echo (Session::getFlash('success') ?>
-        </div>
-    <?php elseif(Session::isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
-        </div>
-    <?php endif; ?>
+<section class="container">
 
+    <div class="alert alert-danger">
+        <?php echo $message ?>
+    </div>
+    <a href="/" class="btn btn-secondary">홈</a>
 
 </section>
 </body>

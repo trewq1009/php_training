@@ -4,34 +4,28 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
 use app\lib\Database;
+use app\lib\exception\CustomException;
 
 try {
     if(!$auth) {
-        throw new Exception('잘못된 경로 입니다.');
+        throw new CustomException('잘못된 경로 입니다.');
     }
     $userModel = (new Database)->findOne('tr_account', ['no'=>$auth['no']]);
     if(!$userModel) {
-        throw new Exception('회원 정보가 없습니다.');
+        throw new CustomException('회원 정보가 없습니다.');
     }
     $userMileage = (new Database)->findOne('tr_mileage', ['user_no'=>$userModel['no']]);
     if(!$userMileage) {
-        throw new Exception('마일리지를 정보를 가져올 수 없습니다.');
+        throw new CustomException('마일리지를 정보를 가져올 수 없습니다.');
     }
 
-} catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Locatioin: /');
+} catch (CustomException $e) {
+    $e->setErrorMessage($e);
 }
 
 
 ?>
 <section class="container">
-
-    <?php if(Session::isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
-        </div>
-    <?php endif; ?>
 
     <form action='<?php echo htmlspecialchars('./profile_action.php');?>' method="post" id="methodForm">
         <div class="mb-3">
