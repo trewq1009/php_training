@@ -3,7 +3,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
-use app\lib\exception\CustomException;
+use app\lib\exception\DatabaseException;
 use app\lib\MailSend;
 use app\lib\Session;
 
@@ -66,22 +66,22 @@ try {
     // 회원정보 저장
     $userNo = $db->save('tr_account', ['id'=>$rebuildData['userId'], 'password'=>$rebuildData['userPw'], 'name'=>$rebuildData['userName'], 'email'=>$rebuildData['userEmail']]);
     if(!$userNo) {
-        throw new CustomException('회원가입 실패했습니다. 다시 시도해 주세요');
+        throw new DatabaseException('회원가입 실패했습니다. 다시 시도해 주세요');
     }
 
     // 회원 마일리지 로그 테이블
     if(!$db->save('tr_mileage_log', ['user_no'=>$userNo, 'method'=>'join'])) {
-        throw new CustomException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
+        throw new DatabaseException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
     }
 
     // 회원 마일리지 테이블
     if(!$db->save('tr_mileage', ['user_no'=>$userNo])) {
-        throw new CustomException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
+        throw new DatabaseException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
     }
 
     // 인증 이메일 발송
     if((new MailSend)->sendRegisterEmail($rebuildData, $userNo) !== true) {
-        throw new CustomException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
+        throw new DatabaseException('이메일 발송에 오류가 있습니다. 관리자에게 문의 주세요.');
     }
 
 
@@ -91,7 +91,7 @@ try {
     exit();
 
 
-} catch (CustomException $e) {
+} catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
     $query = '';

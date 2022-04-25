@@ -21,6 +21,9 @@ $auth = $_SESSION['auth'] ?? false;
                     <li class="nav-item">
                         <a class="nav-link" href="/view/trade/list.php">Trade</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view/visitors/list.php">Visitors</a>
+                    </li>
                 </ul>
 
                 <?php if($auth): ?>

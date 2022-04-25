@@ -4,11 +4,18 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
 
-if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
-    $userId = $_GET['userId'] ?? '';
-    $userName = $_GET['userName'] ?? '';
-    $userEmail = $_GET['userEmail'] ?? '';
+try {
+    if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
+        $userId = $_GET['userId'] ?? '';
+        $userName = $_GET['userName'] ?? '';
+        $userEmail = $_GET['userEmail'] ?? '';
+    }
+
+} catch(Exception $e) {
+    Session::setSession('error', $e->getMessage());
+    header('Location: /');
 }
+
 
 ?>
     <section class="container">
