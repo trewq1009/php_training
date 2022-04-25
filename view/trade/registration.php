@@ -10,7 +10,7 @@ try {
     }
 
 } catch(Exception $e) {
-    Session::setSession('error', $e->getMessage);
+    Session::setSession('error', $e->getMessage());
     header('Location: /');
 }
 
