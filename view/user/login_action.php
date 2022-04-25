@@ -38,11 +38,22 @@ try {
 
 
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    $query = '';
-    foreach ($_GET as $key => $value) {
-        $query .= "$key=$value&";
-    }
-    $preUrl = explode('?', $preUrl)[0];
-    header("Location: $preUrl?$query");
+    $message = $e->getMessage();
 }
+?>
+
+<section class="container">
+
+    <div class="alert alert-danger">
+        <?php echo $message ?>
+    </div>
+    <button type="button" onclick="btnEvent()" class="btn btn-secondary">이전</button>
+
+</section>
+</body>
+<script>
+    function btnEvent() {
+        history.back();
+    }
+</script>
+</html>
