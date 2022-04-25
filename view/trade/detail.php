@@ -9,6 +9,9 @@ try {
     if(empty($_GET['boardNo'])) {
         throw new Exception('잘못된 경로 입니다.');
     }
+    if(empty($auth)) {
+        throw new Exception('로그인 후 이용 가능 합니다.');
+    }
     $db = new Database;
     $boardData = $db->findOne('tr_board', ['no'=>$_GET['boardNo']]);
     $productData = $db->findOne('tr_product', ['no'=>$boardData['reference_no']]);
