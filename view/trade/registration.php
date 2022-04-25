@@ -2,6 +2,18 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
+use app\lib\Session;
+
+try {
+    if(!$auth) {
+        throw new Exception('로그인 후 이용 가능합니다.');
+    }
+
+} catch(Exception $e) {
+    Session::setSession('error', $e->getMessage);
+    header('Location: /');
+}
+
 
 ?>
 <section class="container">
