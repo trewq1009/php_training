@@ -49,7 +49,7 @@ try {
     } else if($_POST['action'] === 'delete') {
 
         $db->pdo->beginTransaction();
-        if(!$db->update('tr_account', ['no' => $auth['no']], ['status' => 'AWAIT'])) {
+        if(!$db->update('tr_account', ['no' => $auth['no']], ['status' => 'a'])) {
             throw new DatabaseException('회원 탈퇴 신청을 실패하였습니다.');
         }
 
@@ -69,9 +69,9 @@ try {
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
-    $e->setErrorMessage($e);
+    $e->setErrorMessages($e);
 } catch (CustomException $e) {
-    $e->setErrorMessage($e);
+    $e->setErrorMessages($e);
 }
 ?>
 
