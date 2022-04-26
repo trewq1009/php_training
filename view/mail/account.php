@@ -30,13 +30,21 @@ try {
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
-    $e->setErrorMessages($e);
-    header('location: /');
+    $mesaage = $e->getMessage();
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('location: /');
+    $message = $e->getMessage();
 }
 
 ?>
+<section class="container">
+
+<div class="alert alert-danger">
+    <?php echo $message ?>
+</div>
+<a href="/" class="btn btn-secondary">홈</a>
+
+</section>
+</body>
+</html>
 
 
