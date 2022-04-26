@@ -4,7 +4,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
 use app\lib\Field;
-use app\lib\Session;
 
 try {
     $page = $_GET['page'] ?? 1;

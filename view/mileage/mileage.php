@@ -2,14 +2,12 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
-use app\lib\Session;
-use app\lib\Utils;
 try {
     if(!$auth) {
         throw new Exception('로그인 후 이용해 주세요.');
     }
 
-} catch(Exceptioin $e) {
+} catch(Exception $e) {
     $message = $e->getMessage();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
     die();

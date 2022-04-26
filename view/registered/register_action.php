@@ -46,7 +46,7 @@ try {
         }
         if($key == 'userPwC') {
             if($postData['userPw'] !== $postData['userPwC']) {
-                throw new ExceptCustomExceptionion('패스워드가 일치 하지 않습니다.');
+                throw new CustomException('패스워드가 일치 하지 않습니다.');
             }
         }
         if($key == 'userName') {
@@ -94,9 +94,10 @@ try {
     $message = '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.';
 
 } catch (CustomException $e) {
-    $e->setErrorMessage($e);
+    $e->setErrorMessages($e);
 } catch (DatabaseException $e) {
-    $message = $e->getMessage();
+    $db->pdo->rollBack();
+    $e->setErrorMessages($e);
 } catch (\Exception $e) {
     $message = $e->getMessage();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';

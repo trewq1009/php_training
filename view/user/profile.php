@@ -2,7 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
-use app\lib\Session;
 use app\lib\Database;
 use app\lib\exception\CustomException;
 
@@ -20,7 +19,7 @@ try {
     }
 
 } catch (CustomException $e) {
-    $e->setErrorMessage($e);
+    $e->setErrorMessages($e);
 }
 
 
