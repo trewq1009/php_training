@@ -5,27 +5,20 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 use app\lib\Session;
 
 try {
-    if(strtolower($_SERVER['REQUEST_METHOD']) == 'get') {
-        $userId = $_GET['userId'] ?? '';
-        $userName = $_GET['userName'] ?? '';
-        $userEmail = $_GET['userEmail'] ?? '';
+    if($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        throw new Exception('올바른 경로가 아닙니다.');
     }
-
+    $userId = $_GET['userId'] ?? '';
+    $userName = $_GET['userName'] ?? '';
+    $userEmail = $_GET['userEmail'] ?? '';
+    
 } catch(Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $e->setErrorMessage($e);
 }
 
 
 ?>
     <section class="container">
-        <?php if(Session::isSet('error')): ?>
-            <div class="alert alert-danger">
-                <?php echo Session::getFlash('error') ?>
-            </div>
-        <?php endif; ?>
-
-
         <form action='<?php echo htmlspecialchars('./register_action.php');?>' method="post" id="methodForm">
             <div class="mb-3">
                 <label for="userId" class="form-label">ID</label>

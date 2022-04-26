@@ -99,6 +99,8 @@ try {
     $message = $e->getMessage();
 } catch (\Exception $e) {
     $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
 
 ?>
