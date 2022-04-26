@@ -55,7 +55,7 @@ class Utils
             // 시간을 월,일,시,분,초 로 표기
             $fileDate = date('mdhis', time());
 
-            $newImageName = chr(rand(97,122)).chr(rand(97,122)).$fileDate.$_SESSION['auth']['no'].".$fileExt";
+            $newImageName = chr(rand(97,122)).chr(rand(97,122)).$fileDate.".$fileExt";
 
             // 임시 저장소에서 이동할 경로와 파일 명
             $fileRoot = $_SERVER['DOCUMENT_ROOT']."/upload/$newImageName";
