@@ -1,12 +1,11 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
-use app\lib\Session;
 if(!session_id()) {
     session_start();
 }
 
-$admin = Session::isSet('admin');
+$admin = $_SESSION['auth'] ?? false;
 
 ?>
 <body>
