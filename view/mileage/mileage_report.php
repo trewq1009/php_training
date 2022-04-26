@@ -12,8 +12,9 @@ try {
     $list = (new Database)->findAll('tr_mileage_log', ['user_no' => $_GET['no']]);
 
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
 
 ?>

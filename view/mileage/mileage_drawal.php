@@ -13,19 +13,13 @@ try {
     $mileageModel = $db->findone('tr_mileage', ['user_no'=>$auth['no']]);
 
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
 
 ?>
 <section class="container">
-
-    <?php if(Session::isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
-        </div>
-    <?php endif; ?>
-
 
     <form action='<?php echo htmlspecialchars('./mileage_drawal_action.php');?>' method="post" id="methodForm">
         <div class="mb-3">

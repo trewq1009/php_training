@@ -4,20 +4,20 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
 use app\lib\Utils;
+try {
+    if(!$auth) {
+        throw new Exception('로그인 후 이용해 주세요.');
+    }
 
-if(!$auth) {
-    Session::setSession('error', '잘못된 경로 입니다.');
-    header('Location: /');
-    exit();
+} catch(Exceptioin $e) {
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
+
 
 ?>
 <section class="container">
-    <?php if(Session::isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo (new Session)->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
 
     <form action='<?php echo htmlspecialchars('./mileage_payment.php');?>' method="get" id="methodForm">
     <div style="display: flex; align-items: center; justify-content: center;">

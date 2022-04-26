@@ -13,8 +13,9 @@ try {
     }
 
 } catch (Exception $e) {
-    Session::setSession('error', '최소 금액은 1000원 입니다.');
-    header("Location: $preUrl");
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }
 
 //} else {

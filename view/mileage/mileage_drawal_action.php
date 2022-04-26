@@ -12,23 +12,23 @@ try {
     $preUrl = $_SERVER['HTTP_REFERER'];
 
     if(!$auth) {
-        throw new Exception('로그인 정보가 없습니다.');
+        throw new CustomException('로그인 정보가 없습니다.');
     }
 
     if(!isset($_POST['usingMileage']) || empty($_POST['useMileage']) || empty($_POST['realMileage']) || empty($_POST['drawalMileage']) || empty($_POST['bankValue']) || empty($_POST['bankNumber'])) {
-        throw new CustomException('입력 데이터를 다시 확인해 주세요.');
+        throw new Exception('입력 데이터를 다시 확인해 주세요.');
     }
     if($_POST['realMileage'] < 1000 || $_POST['drawalMileage'] < 1000) {
-        throw new CustomException('출금 가능한 최소 금액이 안됩니다.');
+        throw new Exception('출금 가능한 최소 금액이 안됩니다.');
     }
     if($_POST['realMileage'] < $_POST['drawalMileage']) {
-        throw new CustomException('출금 가능 마일리지를 넘었습니다.');
+        throw new Exception('출금 가능 마일리지를 넘었습니다.');
     }
     if (!preg_match("/^[0-9]/i", $_POST['bankNumber'])) {
-        throw new CustomException('올바른 계좌 번호가 아닙니다. 숫자만 입력해 주세요.');
+        throw new Exception('올바른 계좌 번호가 아닙니다. 숫자만 입력해 주세요.');
     }
     if (!preg_match("/^[0-9]/i", $_POST['drawalMileage'])) {
-        throw new CustomException('올바른 금앱을 입력해 주세요.');
+        throw new Exception('올바른 금앱을 입력해 주세요.');
     }
 
     // DB on
@@ -63,18 +63,27 @@ try {
 
 
     $db->pdo->commit();
-    Session::setSession('success', '출금 신청이 완료되었습니다.');
-    header('Location: /');
-
+    $message = '출금 신청이 완료되었습니다.';
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header("Location: $preUrl");
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
-    header("Location: $preUrl");
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }
+?>
+<section class="container">
+
+<div class="alert alert-success">
+    <?php echo $message ?>
+</div>
+<a href="/" class="btn btn-secondary">홈</a>
+
+</section>
+</body>
+</html>
+

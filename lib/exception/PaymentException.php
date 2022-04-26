@@ -7,6 +7,8 @@ class PaymentException extends \Exception
 {
     public function setErrorMessages($e)
     {
-        Session::setSession('error', $e->getMessage().$e->getLine());
+        $message = $e->getMessage();
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+        die();
     }
 }

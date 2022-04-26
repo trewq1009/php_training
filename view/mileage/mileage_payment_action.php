@@ -15,7 +15,7 @@ try {
 
     // validation section
     if(empty($postData['radioValue'])) {
-        throw new Exception('올바른 경로가 아닙니다.');
+        throw new CustomException('올바른 경로가 아닙니다.');
     }
 
     // 임시 다른 결제 막아두기
@@ -102,22 +102,31 @@ try {
 
 
     $db->pdo->commit();
-    Session::setSession('success', '결제가 완료되었습니다.');
-    header('Location: /');
+    $message = '결재가 완료 되었습니다.';
 
 
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
-    header("Location: /");
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header("Location: /");
 } catch (PaymentException $e) {
     $e->setErrorMessages($e);
-    header("Location: $preUrl");
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header("Location: $preUrl");
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }
+?>
+
+<section class="container">
+
+    <div class="alert alert-success">
+        <?php echo $message ?>
+    </div>
+    <a href="/" class="btn btn-secondary">홈</a>
+
+</section>
+</body>
+</html>
 
