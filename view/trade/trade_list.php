@@ -3,11 +3,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
-use app\lib\Session;
+use app\lib\exception\CustomException;
 
 try {
     if(!$auth) {
-        throw new Exception('로그인 후 이용해 주세요.');
+        throw new CustomException('로그인 후 이용해 주세요.');
     }
 
     $db = new Database;
@@ -26,24 +26,13 @@ try {
         }
     }
 
-} catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+} catch (CustomException $e) {
+    $e->setErrorMessages($e);
 }
 
 ?>
 
 <section class="container">
-    <?php if(Session::isSet('success')): ?>
-        <div class="alert alert-success">
-            <?php echo Session::getFlash('success') ?>
-        </div>
-    <?php elseif((new Session)->isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
-        </div>
-    <?php endif; ?>
-
     <form action='<?php echo htmlspecialchars('./trade_action.php');?>' method="post" id="formAction">
         <input type="hidden" id="tradeNo" name="tradeNo" value="">
         <input type="hidden" id="tradeType" name="tradeType" value="">

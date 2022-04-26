@@ -68,9 +68,7 @@ try {
     // 상대방이 아직 거래중 상태일때 로직 종료
     if(!$mileageFlag) {
         $db->pdo->commit();
-        Session::setSession('success', '거래 완료 되었습니다.');
-        header("Location: $preUrl");
-        exit();
+        $message = '거래 완료 되었습니다.';
     }
 
     // 3. 해당 거래 마일리지 최종 success 면 판매자에게 update
@@ -105,17 +103,26 @@ try {
     }
 
     $db->pdo->commit();
-    Session::setSession('success', '거래 완료 되었습니다.');
-    header("Location: $preUrl");
-    exit();
+    $message = '거래 완료 되었습니다.';
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    $preUrl = $_SERVER['HTTP_REFERER'];
-    header("Location: $preUrl");
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }
+?>
+
+<section class="container">
+
+    <div class="alert alert-success">
+        <?php echo $message ?>
+    </div>
+    <a href="/" class="btn btn-secondary">홈</a>
+
+</section>
+</body>
+</html>
 

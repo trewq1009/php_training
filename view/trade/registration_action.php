@@ -71,21 +71,15 @@ try {
 
     $db->pdo->commit();
     header('Location: /view/trade/list.php');
-
+    exit();
 
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
-    header('Location: /view/trade/list.php');
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header('Location: /view/trade/list.php');
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    $query = '';
-    foreach ($_POST as $key => $value) {
-        $query .= "$key=$value&";
-    }
-    $preUrl = explode('?', $preUrl)[0];
-    header("Location: $preUrl?$query");
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }

@@ -3,15 +3,15 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Session;
+use app\lib\exception\CustomException;
 
 try {
     if(!$auth) {
-        throw new Exception('로그인 후 이용 가능합니다.');
+        throw new CustomException('로그인 후 이용 가능합니다.');
     }
 
-} catch(Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+} catch(CustomException $e) {
+    $e->setErrorMessages($e);
 }
 
 

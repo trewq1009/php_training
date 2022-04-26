@@ -16,8 +16,9 @@ try {
     $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$boardData['no']]);
 
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
 
 ?>

@@ -27,16 +27,13 @@ try {
     }
 
 } catch (Exception $e) {
-    var_dump($e->getMessage());
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
 
 ?>
 <section class="container">
-    <?php if(Session::isSet('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Session::getFlash('error') ?>
-        </div>
-    <?php endif; ?>
 
     <div style="margin: 1rem 0">
         <a class="btn btn-outline-primary" href="registration.php">거래등록</a>

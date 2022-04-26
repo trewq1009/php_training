@@ -3,7 +3,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
-use app\lib\Session;
 use app\lib\exception\DatabaseException;
 
 try {
@@ -80,12 +79,13 @@ try {
 
     $db->pdo->commit();
     header('Location: /view/trade/trade_list.php');
+    exit();
 
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
-    header('Location: /view/trade/list.php');
 } catch (Exception $e) {
-    Session::setSession('error', $e->getMessage());
-    header('Location: /');
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
+    die();
 }
