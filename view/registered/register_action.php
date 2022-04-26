@@ -4,20 +4,20 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
 use app\lib\MailSend;
-use app\lib\Session;
 use app\lib\exception\DatabaseException;
-use app\lib\exception\CustomException;
 
 try {
+    $preUrl = $_SERVER['HTTP_REFERER'];
+
     if($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new CustomException('잘못된 경로 입니다.');
+        throw new Exception('잘못된 경로 입니다.');
     }
 
     // 가입을 위한 Validation 작업
     $postData = $_POST;
     $inputTagValue = ['userId'=>$postData['userId'], 'userEmail'=>$postData['userEmail'], 'userName'=>$postData['userName']];
     if (empty($postData['userId']) || empty($postData['userName']) || empty($postData['userPw']) || empty($postData['userPwC']) || empty($postData['userEmail'])) {
-        throw new CustomException('필수 정보를 기입해 주세요');
+        throw new Exception('필수 정보를 기입해 주세요');
     }
 
     // DB 연결 시작
@@ -31,35 +31,35 @@ try {
         if($key == 'userId') {
             // pattern 체크
             if (!preg_match("/^[a-zA-Z0-9-' ]*$/", $inputData)) {
-                throw new CustomException('아이디 형태가 올바르지 않습니다.');
+                throw new Exception('아이디 형태가 올바르지 않습니다.');
             }
             // DB 중복 확인
             if ($db->findOne('tr_account', ['id' => $inputData])) {
-                throw new CustomException('중복된 아이디 입니다.');
+                throw new Exception('중복된 아이디 입니다.');
             }
         }
         if($key == 'userPw') {
             if(strlen($inputData) < 8 || strlen($inputData) > 20) {
-                throw new CustomException('비밀번호 형식에 맞지 않습니다.');
+                throw new Exception('비밀번호 형식에 맞지 않습니다.');
             }
             $inputData = password_hash($inputData, PASSWORD_BCRYPT);
         }
         if($key == 'userPwC') {
             if($postData['userPw'] !== $postData['userPwC']) {
-                throw new CustomException('패스워드가 일치 하지 않습니다.');
+                throw new Exception('패스워드가 일치 하지 않습니다.');
             }
         }
         if($key == 'userName') {
             if (!preg_match("/^[가-힣]{9,}$/", $inputData)) {
-                throw new CustomException('올바른 이름의 형태가 아닙니다.');
+                throw new Exception('올바른 이름의 형태가 아닙니다.');
             }
         }
         if($key == 'userEmail') {
             if(!filter_var($inputData, FILTER_VALIDATE_EMAIL)) {
-                throw new CustomException('이메일 형식에 맞지 않습니다.');
+                throw new Exception('이메일 형식에 맞지 않습니다.');
             }
             if ($db->findOne('tr_account', ['email' => $inputData])) {
-                throw new CustomException('중복된 이메일 입니다.');
+                throw new Exception('중복된 이메일 입니다.');
             }
         }
         $rebuildData[$key] = $inputData;
@@ -93,14 +93,12 @@ try {
     $db->pdo->commit();
     $message = '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.';
 
-} catch (CustomException $e) {
-    $e->setErrorMessages($e);
 } catch (DatabaseException $e) {
     $db->pdo->rollBack();
     $e->setErrorMessages($e);
 } catch (\Exception $e) {
     $message = $e->getMessage();
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error_prv.php';
     die();
 }
 
@@ -111,7 +109,7 @@ try {
     <div class="alert alert-success">
         <?php echo $message ?>
     </div>
-    <a herf="/" class="btn btn-secondary">홈</a>
+    <a href="/" class="btn btn-secondary">홈</a>
 
 </section>
 </body>

@@ -122,7 +122,7 @@ class Database
         try {
             $setValue = implode(' , ', array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
 
-            $setValue = $setValue.', updated = :updated';
+            $setValue = $setValue.', update_date = :update_date';
 
             $setWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($where)));
 
@@ -136,7 +136,7 @@ class Database
             // updated Date
             $date = new DateTime("NOW");
             $timeStamp = $date->format('Y-m-d H:i:s');
-            $statement->bindValue(':updated', $timeStamp);
+            $statement->bindValue(':update_date', $timeStamp);
 
             // where bind
             foreach ($where as $key => $value) {
@@ -171,7 +171,7 @@ class Database
                     $whereSql .= "$key = '$value' AND ";
                 }
             }
-            $whereSql .= "(status = 'ALIVE' OR status = 'AWAIT')";
+            $whereSql .= "(status = 't' OR status = 'a')";
 
             $statement = $this->pdo->prepare("SELECT COUNT(*) AS count FROM $tableName WHERE $whereSql");
             $statement->execute();

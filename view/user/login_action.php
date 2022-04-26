@@ -19,7 +19,7 @@ try {
         throw new Exception('아이디 형태가 올바르지 않습니다.');
     }
 
-    $userData = (new Database)->findOne('tr_account', ['id'=>$_POST['userId'], 'status'=>'y']);
+    $userData = (new Database)->findOne('tr_account', ['id'=>$_POST['userId'], 'status'=>'t']);
     if(!$userData) {
         throw new Exception('계정을 다시 확인해 주세요');
     }
