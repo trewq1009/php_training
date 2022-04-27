@@ -1,0 +1,30 @@
+.mainArea {
+    height: 6.25em;
+    resize: none;
+}
+
+.firstBox {
+    margin: 0 0 1rem 0;
+}
+
+.firstBox > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.firstBox > div > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.commentBox {
+    background-color: rgba(211,211,211);
+    display: none;
+    padding: 1rem 1rem;
+}
+
+.commentBox > .input-group > textarea {
+    height: 3.25em;
+    resize: none;
+}
