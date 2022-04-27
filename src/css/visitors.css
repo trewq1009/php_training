@@ -5,14 +5,11 @@
 
 .firstBox {
     margin: 0 0 1rem 0;
-}
-
-.firstBox > div {
     display: flex;
     flex-direction: column;
 }
 
-.firstBox > div > div {
+.firstBox > div {
     display: flex;
     align-items: center;
     justify-content: space-between;

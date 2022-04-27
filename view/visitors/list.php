@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 use app\lib\Database;
 
 try {
-    $listData = (new Database)->findAll('tr_visitors_board', ['status'=>'t']);
+    $listData = (new Database)->findAll('tr_visitors_board', ['status'=>'t', 'parents_no'=>0]);
 
 
 } catch(Exception $e) {
@@ -40,33 +40,25 @@ try {
             <?php foreach($listData as $key => $value): ?>
                 <li class="list-group-item" data-board="<?php echo $value['no']; ?>">
                     <div class="firstBox">
-                        <div>
+                        <div data-board="<?php echo $value['no']; ?>" data-user="<?php echo $value['user_no']; ?>" data-type="<?php echo $value['user_type']; ?>">
+                            <span><?php echo $value['user_name']; ?></span>
                             <div>
-                                <span><?php echo $value['user_name']; ?></span>
-                                <?php if(!$auth): ?>
-                                    <?php if($value['user_type'] == 'g'): ?>
-                                    <div>
-                                        <small>수정</small>
-                                        <small>삭제</small>
-                                    </div>
-                                    <?php endif; ?>
-                                <?php elseif($auth['no'] == $value['user_no']): ?>
-                                    <div>
-                                        <small>수정</small>
-                                        <small>삭제</small>
-                                    </div>
+                                <?php if($value['user_type'] == 'g'): ?>
+                                <input type="password" name="boardPassword" style="height: 1.25rem; width: 10rem;" placeholder="password">
                                 <?php endif; ?>
+                                <small onclick="updateHtml(this)">수정</small>
+                                <small onclick="deleteAction(this)">삭제</small>
                             </div>
-                            <small><?php echo $value['registration_date']; ?></small>
                         </div>
+                        <small><?php echo $value['registration_date']; ?></small>
                     </div>
 
-                    <div>
+                    <div id="contentBox<?php echo $value['no']; ?>">
                         <p><?php echo $value['content']; ?></p>
                     </div>
 
                     <div>
-                        <a href="javascript:void(0);" onclick="commentList(this)" data-count="<?php echo $value['comment_count']; ?>" style="color: red;">댓글 <?php echo $value['comment_count']; ?></a>
+                        <a href="javascript:void(0);" onclick="commentList(this)" style="color: red;">댓글 <?php echo $value['comment_count']; ?></a>
                     </div>
 
                     <div id="commentBox<?php echo $value['no']; ?>" class="commentBox">
@@ -77,6 +69,9 @@ try {
                         <div class="input-group">
                             <textarea class="form-control" aria-label="With textarea" id="comment<?php echo $value['no']; ?>" placeholder="글을 입력해 주세요."></textarea>
                             <span class="input-group-text">
+                                <?php if(!$auth): ?>
+                                <input type="password" name="boardPassword" style="height: 1.25rem; width: 10rem;" placeholder="password">
+                                <?php endif; ?>
                                 <button type="button" class="btn btn-secondary" onclick='commentEvent(this)' data-board="<?php echo $value['no']; ?>">등록</button>
                             </span>
                         </div>
@@ -109,80 +104,173 @@ try {
     function commentList(event) {
         // 댓글 카운트 확인 후 없으면 댓글이 없습니다.
         // 있으면 댓글 보여주기
-        console.log('현재 댓글 갯수 : ' + event.dataset.count);
-        const count = event.dataset.count;
         console.log('댓글 확인할 보드 NO : ' + event.parentElement.parentElement.dataset.board);
         const board_num = event.parentElement.parentElement.dataset.board;
-        
-        if(count > 0) {
-            console.log('댓글 존재 ajax 작업');
-            $.ajax({
-                type : 'POST',
-                url : '/view/ajax/visitors/commentList.php',
-                data : {
-                    board_num : board_num
-                },
-                success : function(result){
-                    const re_data = JSON.parse(result);
-                    if(re_data.status === 'success') {
-                        const comment_box = document.querySelector('#commentBox'+board_num).firstElementChild.firstElementChild;
-                        comment_box.innerHTML = re_data.message;
-                    } else {
-                        console.log(re_data);
-                        window.alert('댓글 불러오기 에러');
-                    }
-                },error : function(e){
-                    console.log(e);
-                    window.alert('댓글을 불러오는중 에러가 발생했습니다.');
-                }
-            });
-            const comment_section = document.querySelector('#commentBox'+board_num);
-            comment_section.style.display = 'block';
-        } else {
-            console.log('댓글 없음 html 작업만');
-            const comment_section = document.querySelector('#commentBox'+board_num);
-            comment_section.style.display = 'block';
-        }
 
+        $.ajax({
+            type : 'POST',
+            url : '/view/ajax/visitors/commentList.php',
+            data : {
+                board_num : board_num
+            },
+            success : result => {
+                const re_data = JSON.parse(result);
+                if(re_data.status === 'success') {
+                    const comment_box = document.querySelector('#commentBox'+board_num).firstElementChild.firstElementChild;
+                    comment_box.innerHTML = re_data.message;
+
+                    const comment_section = document.querySelector('#commentBox'+board_num);
+                    comment_section.style.display = 'block';
+                } else {
+                    console.log(re_data);
+                    window.alert('댓글 불러오기 에러');
+                }
+            },error : e => {
+                console.log(e);
+                window.alert('댓글을 불러오는중 에러가 발생했습니다.');
+            }
+        });
     }
 
     // 댓글 등록
     function commentEvent(event) {
         const user_info = <?php echo json_encode($auth) ?>;
+        const parent_board_num = event.dataset.board;
+        const comment = document.getElementById('comment'+parent_board_num).value;
+
         if(!user_info) {
             const result = window.confirm('비회원으로 댓글을 등록 하시겠습니까?');
             if(!result) {
                 return;
             }
             // 비회원 댓글 등록
-            return;
-        }
-        // 회원 댓글 등록
-        const parent_board_num = event.dataset.board;
-        const comment = document.getElementById('comment'+parent_board_num).value;
-        
-        $.ajax({
-            type : 'POST',
-            url : '/view/ajax/visitors/comment.php',
-            data : {
-                parent_no: parent_board_num,
-                comment : comment
-            },
-            success : function(result){
-                console.log(result);
-                const re_data = JSON.parse(result);
-                console.log(re_data);
-                if(re_data.status === 'success') {
-                    window.alert(re_data.message);
-                    window.location.reload();
-                } else {
-                    window.alert(re_data.message);
-                }
-            },error : function(e){
-                console.log(e);
-                window.alert('에러가 발생했습니다.')
+            const password = event.previousElementSibling.value;
+            if(password === '') {
+                window.alert('비회원은 패스워드가 필수 입니다.');
+                console.log(password);
+                return;
             }
-        });
+            $.ajax({
+                type: 'POST',
+                url: '/view/ajax/visitors/comment.php',
+                data: {
+                    parent_no: parent_board_num,
+                    comment: comment,
+                    comment_password: password
+                },
+                success: result => {
+                    const re_data = JSON.parse(result);
+                    if (re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                    }
+                }, error: e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+
+        } else {
+            // 회원 댓글 등록
+            $.ajax({
+                type: 'POST',
+                url: '/view/ajax/visitors/comment.php',
+                data: {
+                    parent_no: parent_board_num,
+                    comment: comment
+                },
+                success: result => {
+                    const re_data = JSON.parse(result);
+                    if (re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                    }
+                }, error: e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+        }
     }
+
+    function deleteAction(event) {
+        const user_info = <?php echo json_encode($auth) ?>;
+        const board_no = event.parentElement.parentElement.dataset.board;
+        const type = event.parentElement.parentElement.dataset.type;
+
+        if(type === 'm') {
+            if(user_info === false) {
+                window.alert('로그인 후 이용해 주세요.');
+                return;
+            }
+
+            const result = window.confirm('삭제 하시겠습니까?');
+            if(!result) {
+                return;
+            }
+            $.ajax({
+                type : 'POST',
+                url : '/view/ajax/visitors/delete.php',
+                data : {
+                    board_no: board_no,
+                    board_type : type
+                },
+                success : result => {
+                    const re_data = JSON.parse(result);
+                    if(re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                    }
+                },error : e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+        } else {
+            const password = event.previousElementSibling.previousElementSibling.value;
+            if(password === '') {
+                window.alert('패스워드를 입력해 주세요');
+                return;
+            }
+            $.ajax({
+                type : 'POST',
+                url : '/view/ajax/visitors/delete.php',
+                data : {
+                    board_no: board_no,
+                    password: password,
+                    board_type : type
+                },
+                success : result => {
+                    const re_data = JSON.parse(result);
+                    if(re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                    }
+                },error : e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+        }
+    };
+
+    function updateHtml(event) {
+        const board_no = event.parentElement.parentElement.dataset.board;
+        const textareaBox = document.querySelector('#contentBox'+board_no);
+        const inner_text = textareaBox.firstElementChild.innerHTML;
+        textareaBox.innerHTML = '<div class="input-group"><textarea class="form-control" aria-label="With textarea" placeholder="글을 입력해 주세요."></textarea>' +
+            '<span class="input-group-text"><button type="button" class="btn btn-secondary">수정</button></span></div>';
+
+        textareaBox.firstElementChild.firstElementChild.innerHTML = inner_text;
+    }
+
 </script>
 </html>

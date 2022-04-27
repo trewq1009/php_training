@@ -21,7 +21,7 @@ try {
         if(empty($_POST['comment_password'])) {
             throw new Exception('게스트 댓글은 패스워드가 필수 입니다.');
         }
-        $params = ['user_type'=>'g', 'user_name'=>'게스트', 'visitors_password'=>$_POST['comment_password'], 'parents_no'=>$_POST['parent_no'], 'content'=>$_POST['comment']];
+        $params = ['user_type'=>'g', 'user_name'=>'게스트', 'visitors_password'=>password_hash($_POST['comment_password'], PASSWORD_BCRYPT), 'parents_no'=>$_POST['parent_no'], 'content'=>$_POST['comment']];
     } else {
         $params = ['user_type'=>'m', 'user_no'=>$auth['no'], 'user_name'=>$auth['name'], 'parents_no'=>$_POST['parent_no'], 'content'=>$_POST['comment']];
     }
