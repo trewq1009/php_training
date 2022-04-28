@@ -140,7 +140,7 @@ try {
     }
 
     // 댓글 등록
-    function commentEvent(event) {
+    async function commentEvent(event) {
         const user_info = <?php echo json_encode($auth) ?>;
         const parent_board_num = event.dataset.board;
         const comment = document.getElementById('comment'+parent_board_num).value;
@@ -157,7 +157,7 @@ try {
                 console.log(password);
                 return;
             }
-            $.ajax({
+            await $.ajax({
                 type: 'POST',
                 url: '/view/ajax/visitors/comment.php',
                 data: {
@@ -181,7 +181,7 @@ try {
 
         } else {
             // 회원 댓글 등록
-            $.ajax({
+            await $.ajax({
                 type: 'POST',
                 url: '/view/ajax/visitors/comment.php',
                 data: {

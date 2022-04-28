@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 use app\lib\Database;
+use app\lib\MailSend;
 use app\lib\exception\DatabaseException;
 
 try {
@@ -44,8 +45,13 @@ try {
         throw new DatabaseException('댓글 등록에 실패했습니다.');
     }
 
-    $db->pdo->commit();
+    // mail 발송
+    if(!empty($parentsData['user_no'])) {
+        $parentsUser = $db->findOne('tr_account', ['no'=>$parentsData['user_no']]);
+        $mailBool = (new MailSend)->sendCommentEmail($parentsUser);
+    }
 
+    $db->pdo->commit();
     echo json_encode(['status'=>'success', 'message'=>'댓글 등록이 완료 되었습니다.']);
 
 } catch (DatabaseException $e) {

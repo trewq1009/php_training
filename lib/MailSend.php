@@ -65,7 +65,58 @@ class MailSend
             $mail->send();
             return true;
         } catch (Exception $e) {
-            return $e->errorMessage();
+            return false;
+        }
+    }
+
+    public function sendCommentEmail($userData): bool
+    {
+        try {
+            $this->to_email = $userData['email'];
+            $mail = new PHPMailer(true);
+            $mail->CharSet = "UTF-8";
+
+            //Server settings
+//            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host = EMAIL_HOST;                             //Set the SMTP server to send through
+            $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+            $mail->Username = EMAIL_USER;                             //SMTP username
+            $mail->Password = EMAIL_PASSWORD;                         //SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+            $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+            //Recipients
+            $mail->setFrom(EMAIL_USER, 'JeongGuk');
+            $mail->addReplyTo(EMAIL_USER, 'JeongGuk');
+
+            // 받는 사람
+            $mail->addAddress($this->to_email);               //Name is optional
+//            $mail->addAddress('joe@example.net', 'Joe User');     //Add a recipient
+//            $mail->addCC('cc@example.com');
+//            $mail->addBCC('bcc@example.com');
+
+            //Attachments
+            // 첨부 파일
+//            $mail->addAttachment('/var/tmp/file.tar.gz');         //Add attachments
+//            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    //Optional name
+
+            //Content
+            $mail->isHTML(true);                                  //Set email format to HTML
+            $mail->Subject = '댓글 알림';
+            $mail->Body = "
+                            <div>
+                                <div>
+                                    <h3>회원님이 등록한 방명록에 게시글이 달렸습니다.</h3>
+                                </div>
+                            </div>";
+//            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            return false;
         }
     }
 
