@@ -6,7 +6,7 @@ use app\lib\Session;
 use app\lib\Database;
 
 try {
-    $withdrawalList = (new Database)->findAll('tr_withdrawal_log', ['status'=>'await']);
+    $withdrawalList = (new Database)->findAll('tr_withdrawal_log', ['status'=>'await'], 's');
     foreach ($withdrawalList as $key => $value) {
         $userModel = (new Database)->findOne('tr_account', ['no'=>$value['user_no']], 'i');
         $withdrawalList[$key]['name'] = $userModel['name'];
