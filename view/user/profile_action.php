@@ -36,7 +36,7 @@ try {
 
         mysqli_autocommit($db->conn, FALSE);
 
-        if (!$db->update('tr_account', ['no' => $auth['no']], ['name' => $postData['userName'], 'password' => $postData['userPw']], 'ssi')) {
+        if (!$db->update('tr_account', ['name' => $postData['userName'], 'password' => $postData['userPw']], ['no' => $auth['no']], 'ssi')) {
             throw new DatabaseException('정보 수정에 실패했습니다.');
         }
 
@@ -49,7 +49,7 @@ try {
     } else if($_POST['action'] === 'delete') {
 
         mysqli_autocommit($db->conn, FALSE);
-        if(!$db->update('tr_account', ['no' => $auth['no']], ['status' => 'a'])) {
+        if(!$db->update('tr_account',['status' => 'a'], ['no' => $auth['no']], 'si')) {
             throw new DatabaseException('회원 탈퇴 신청을 실패하였습니다.');
         }
 

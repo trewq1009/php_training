@@ -53,8 +53,8 @@ try {
     }
 
 
-    $userMileageBoolean = $db->update('tr_mileage', ['user_no'=>$auth['no']], ['using_mileage'=>$userMileageModel['using_mileage'] + $_POST['drawalMileage'], 'use_mileage'=>$userMileageModel['use_mileage'] - $_POST['drawalMileage'],
-                                            'real_mileage'=>$userMileageModel['real_mileage'] - $_POST['drawalMileage']]);
+    $userMileageBoolean = $db->update('tr_mileage', ['using_mileage'=>$userMileageModel['using_mileage'] + $_POST['drawalMileage'], 'use_mileage'=>$userMileageModel['use_mileage'] - $_POST['drawalMileage'],
+                                            'real_mileage'=>$userMileageModel['real_mileage'] - $_POST['drawalMileage']], ['user_no'=>$auth['no']], 'iiii');
 
     if(!$userMileageBoolean) {
         throw new DatabaseException('마일리지 변경에 실패했습니다.');

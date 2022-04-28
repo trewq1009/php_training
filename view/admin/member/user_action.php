@@ -18,11 +18,11 @@ try {
     $db = new Database;
     mysqli_autocommit($db->conn, FALSE);
     if($_POST['action'] == 'update') {
-        if(!$db->update('tr_account', ['no'=>$_POST['userNo']], ['name'=>$_POST['userName']])) {
+        if(!$db->update('tr_account', ['name'=>$_POST['userName']], ['no'=>$_POST['userNo']], 'si')) {
             throw new DatabaseException('회원정보 변경에 실패했습니다.');
         }
     } else {
-        if(!$db->update('tr_account', ['no'=>$_POST['userNo']], ['status'=>'DEAD'])) {
+        if(!$db->update('tr_account', ['status'=>'DEAD'], ['no'=>$_POST['userNo']], 'si')) {
             throw new DatabaseException('회원 탈퇴에 실패하였습니다.');
         }
     }

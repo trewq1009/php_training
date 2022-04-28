@@ -40,7 +40,7 @@ try {
     }
 
     mysqli_autocommit($db->conn, FALSE);
-    $result = $db->update('tr_visitors_board', ['no' => $_POST['board_no']], ['status' => 'f']);
+    $result = $db->update('tr_visitors_board', ['status' => 'f'], ['no' => $_POST['board_no']], 'si');
 
     if (!$result) {
         throw new DatabaseException('게시글 삭제에 실패했습니다.');
@@ -48,7 +48,7 @@ try {
 
     if($boardData['parents_no'] != 0) {
         $parentsData = $db->findOne('tr_visitors_board', ['no'=>$boardData['parents_no']], 'i', 'FOR UPDATE');
-        $parentsBool = $db->update('tr_visitors_board', ['no'=>$boardData['parents_no']], ['comment_count'=>$parentsData['comment_count'] - 1]);
+        $parentsBool = $db->update('tr_visitors_board', ['comment_count'=>$parentsData['comment_count'] - 1], ['no'=>$boardData['parents_no']], 'ii');
         if(!$parentsBool) {
             throw new DatabaseException('작업에 실패하였습니다.');
         }

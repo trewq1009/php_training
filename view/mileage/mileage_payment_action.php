@@ -92,8 +92,8 @@ try {
     }
 
     // 유저 마일리지 테이블 적용
-    $mileageUpdateResult = $db->update('tr_mileage', ['user_no'=>$auth['no']], ['use_mileage'=>$userMileageModel['use_mileage'] + $postData['price'],
-                                        'real_mileage'=>$userMileageModel['real_mileage'] + $postData['price']]);
+    $mileageUpdateResult = $db->update('tr_mileage', ['use_mileage'=>$userMileageModel['use_mileage'] + $postData['price'],
+                                        'real_mileage'=>$userMileageModel['real_mileage'] + $postData['price']], ['user_no'=>$auth['no']], 'iii');
 
     if(!$mileageUpdateResult) {
         throw new DatabaseException('마일리지 적용에 실패했습니다.');

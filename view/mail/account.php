@@ -22,7 +22,7 @@ try {
         throw new Exception('이미 인증된 회원 입니다.');
     }
 
-    if(!$db->update('tr_account', ['no'=>$userData['no']], ['email_status'=>'t'])) {
+    if(!$db->update('tr_account', ['email_status'=>'t'], ['no'=>$userData['no']], 'si')) {
         throw new DatabaseException('회원 활성화에 실패하였습니다.');
     }
 

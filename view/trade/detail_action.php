@@ -67,9 +67,9 @@ try {
     // 이벤트 혹은 사용 전용 마일리지를 먼저 다 소모했다 생각하고 real_mileage 를 차감된 마일리지로 변경
     $usingMileage = $userMileageData['using_mileage'] + $_POST['price'];    // 사용중 마일리지 증가 값
     if($differenceMileage < $userMileageData['real_mileage']) {
-        $mileageUpdateBool = $db->update('tr_mileage', ['user_no'=>$auth['no']], ['use_mileage'=>$differenceMileage, 'real_mileage'=>$differenceMileage, 'using_mileage'=>$usingMileage]);
+        $mileageUpdateBool = $db->update('tr_mileage', ['use_mileage'=>$differenceMileage, 'real_mileage'=>$differenceMileage, 'using_mileage'=>$usingMileage], ['user_no'=>$auth['no']], 'iiii');
     } else {
-        $mileageUpdateBool = $db->update('tr_mileage', ['user_no'=>$auth['no']], ['use_mileage'=>$differenceMileage, 'using_mileage'=>$userMileageData]);
+        $mileageUpdateBool = $db->update('tr_mileage', ['use_mileage'=>$differenceMileage, 'using_mileage'=>$userMileageData], ['user_no'=>$auth['no']], 'iii');
     }
 
     // mileage update boolean

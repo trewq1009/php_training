@@ -54,13 +54,15 @@ try {
         if($tradeLogData['seller_trade_status'] == 'ongoing') {
             $params = ['buyer_trade_status'=>'success', 'buyer_status_date'=>$timeStamp];
             $mileageFlag = false;
+            $dbType = 'sdi';
         } else {
             $params = ['buyer_trade_status'=>'success', 'buyer_status_date'=>$timeStamp, 'trade_success_date'=>$timeStamp, 'status'=>'success'];
             $mileageFlag = true;
+            $dbType = 'sddsi';
         }
     }
 
-    if(!$db->update('tr_trade_log', ['no'=>$_POST['tradeNo']], $params)) {
+    if(!$db->update('tr_trade_log', $params, ['no'=>$_POST['tradeNo']], $dbType)) {
         throw new DatabaseException('작업에 실패하였습니다.');
     }
 
@@ -86,8 +88,8 @@ try {
         throw new DatabaseException('작업에 실패하였습니다.');
     }
 
-    $sellerMileageBoolean = $db->update('tr_mileage', ['user_no'=>$sellerData['user_no']], ['use_mileage'=>$sellerData['use_mileage'] + $realPrice,
-                                            'real_mileage'=>$sellerData['use_mileage'] + $realPrice]);
+    $sellerMileageBoolean = $db->update('tr_mileage', ['use_mileage'=>$sellerData['use_mileage'] + $realPrice,
+                                            'real_mileage'=>$sellerData['use_mileage'] + $realPrice], ['user_no'=>$sellerData['user_no']], 'iii');
 
     if(!$sellerMileageBoolean) {
         throw new DatabaseException('작업에 실패하였습니다.');
@@ -97,7 +99,7 @@ try {
     // 4. 거래 완전 확정일때 구매자의 using_mileage 도 사용 처리
     $buyerData = $db->findOne('tr_mileage', ['user_no'=>$tradeLogData['buyer_no']], 'i', 'FOR UPDATE');
 
-    if(!$db->update('tr_mileage', ['user_no'=>$buyerData['user_no']], ['using_mileage'=>$buyerData['using_mileage'] - $tradeLogData['trade_price']])) {
+    if(!$db->update('tr_mileage', ['using_mileage'=>$buyerData['using_mileage'] - $tradeLogData['trade_price']], ['user_no'=>$buyerData['user_no']], 'ii')) {
         throw new DatabaseException('작업에 실패하였습니다.');
     }
 

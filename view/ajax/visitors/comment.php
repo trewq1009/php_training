@@ -42,7 +42,7 @@ try {
         throw new DatabaseException('댓글 등록에 실패했습니다.');
     }
 
-    $updateResult = $db->update('tr_visitors_board', ['no'=>$_POST['parent_no']], ['comment_count'=>$parentsData['comment_count'] + 1]);
+    $updateResult = $db->update('tr_visitors_board', ['comment_count'=>$parentsData['comment_count'] + 1], ['no'=>$_POST['parent_no']], 'ii');
     if(!$updateResult) {
         throw new DatabaseException('댓글 등록에 실패했습니다.');
     }

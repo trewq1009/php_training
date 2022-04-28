@@ -170,7 +170,7 @@ class Database
     }
 
 
-    public function update ($tableName, $where, $params, $type = '')
+    public function update ($tableName, $params, $where, $type = '')
     {
         try {
             $setValue = implode(' , ', array_map(fn($attr) => "$attr = ?", array_keys($params)));

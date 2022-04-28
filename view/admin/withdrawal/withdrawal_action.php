@@ -23,7 +23,7 @@ try {
         throw new DatabaseException('회원정보가 다릅니다.');
     }
 
-    if(!$db->update('tr_withdrawal_log', ['no'=>$_POST['logNo']], ['status'=>'success'])) {
+    if(!$db->update('tr_withdrawal_log', ['status'=>'success'], ['no'=>$_POST['logNo']], 'si')) {
         throw new DatabaseException('로그 변경에 실패하였습니다.');
     }
 
@@ -35,7 +35,7 @@ try {
 
     $confrimMiileage = $userMileageData['using_mileage'] - $withdrawalLogData['withdrawal_mileage'];
 
-    if(!$db->update('tr_mileage', ['user_no'=>$_POST['userNo']], ['using_mileage'=>$confrimMiileage])) {
+    if(!$db->update('tr_mileage', ['using_mileage'=>$confrimMiileage], ['user_no'=>$_POST['userNo']], 'ii')) {
         throw new DatabaseException('출금 완료에 실패하였습니다.');
     }
 

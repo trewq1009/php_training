@@ -37,7 +37,7 @@ try {
     }
     mysqli_autocommit($db->conn, FALSE);
 
-    $updateBool = $db->update('tr_visitors_board', ['no'=>$_POST['board_no']], ['content'=>$_POST['text_data']]);
+    $updateBool = $db->update('tr_visitors_board', ['content'=>$_POST['text_data']], ['no'=>$_POST['board_no']], 'si');
     if(!$updateBool) {
         throw new DatabaseException('게시글 수정에 실패했습니다.');
     }
