@@ -9,23 +9,37 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/config/config.php';
 
 class Database
 {
-    public PDO $pdo;
-
+//    public PDO $pdo;
+//    public function __construct()
+//    {
+//        // 생성시 디비 연결 후 테스트 까지
+//        // 미 연결시 디비 오류
+//        try {
+//            $host = DB_HOST;
+//            $user = DB_USER;
+//            $password = DB_PASSWORD;
+//
+//            $this->pdo = new PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
+//        } catch (\PDOException | Exception $e) {
+//            die($e->getMessage());
+//        }
+//    }
+    public $db;
     public function __construct()
     {
-        // 생성시 디비 연결 후 테스트 까지
-        // 미 연결시 디비 오류
         try {
-            $host = DB_HOST;
-            $user = DB_USER;
-            $password = DB_PASSWORD;
+            $db = @mysqli_connect(HOST_NAME, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT);
+            if(!$db) {
+                $error = mysqli_connect_errno();
+                $errno = mysqli_connect_errno();
+                throw new Exception("$errno : $error\n");
+            }
+            $this->db = $db;
 
-            $this->pdo = new PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
-        } catch (\PDOException | Exception $e) {
+        } catch (Exception $e) {
             die($e->getMessage());
         }
     }
-
 
     public function save($tableName, $params)
     {

@@ -9,7 +9,7 @@ try {
     $page = $_GET['page'] ?? 1;
 
     $db = new Database;
-    $listData = $db->list('tr_board', $page, ['board_type'=>'trade']);
+    $listData = $db->list('tr_trade_board', $page, []);
     if($listData) {
         $boardList = $listData['listData'];
         unset($listData['listData']);
