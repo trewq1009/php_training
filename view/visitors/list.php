@@ -14,9 +14,10 @@ try {
     $btnHtml = Field::listBtn($totalData);
 
 } catch(Exception $e) {
-
+    $message = $e->getMessage();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/view/error/error.php';
+    die();
 }
-
 
 ?>
 <section class="container">
@@ -68,7 +69,7 @@ try {
 
                     <div id="commentBox<?php echo $value['no']; ?>" class="commentBox">
                         <div id="commentBlock">
-                            <ul class="list-group"></ul>
+                            <ul class="list-group" data-board="<?php echo $value['no']; ?>"></ul>
                         </div>
 
                         <div class="input-group">
@@ -107,7 +108,7 @@ try {
     };
 
     // 댓글 불러오기
-    function commentList(event) {
+    function commentList(event, page = 1) {
         // 댓글 카운트 확인 후 없으면 댓글이 없습니다.
         // 있으면 댓글 보여주기
         const board_num = event.parentElement.parentElement.dataset.board;
@@ -116,7 +117,8 @@ try {
             type : 'POST',
             url : '/view/ajax/visitors/commentList.php',
             data : {
-                board_num : board_num
+                board_num : board_num,
+                page : page
             },
             success : result => {
                 const re_data = JSON.parse(result);
@@ -127,8 +129,8 @@ try {
                     const comment_section = document.querySelector('#commentBox'+board_num);
                     comment_section.style.display = 'block';
                 } else {
-                    console.log(re_data);
                     window.alert('댓글 불러오기 에러');
+                    console.log(re_data.message);
                 }
             },error : e => {
                 console.log(e);

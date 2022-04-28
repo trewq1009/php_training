@@ -8,12 +8,14 @@ try {
         session_start();
     }
     $auth = $_SESSION['auth'] ?? false;
-    if(empty($_POST['board_num'])) {
+    if(empty($_POST['board_num']) || empty($_POST['page'])) {
         throw new Exception('댓글 불러오기에 실패했습니다.');
     }
 
     $db = new Database;
-    $boardData = $db->findAll('tr_visitors_board', ['parents_no'=>$_POST['board_num'], 'status'=>'t']);
+    $totalData = $db->list('tr_visitors_board', $_POST['page'], ['parents_no'=>$_POST['board_num'], 'status'=>'t']);
+
+    $boardData = $totalData['listData'];
 
     $html = '';
     if(count($boardData) == 0) {
@@ -39,7 +41,7 @@ try {
                   <small onclick='deleteAction(this)'>삭제</small>
                   </div></div></div><div id='contentBox{$value["no"]}'>
                   <p>{$value['content']}</p>
-                  </div><div id='commentBox{$value['no']}' class='commentBox'><div id='commentBlock'><ul class='list-group'></ul></div>
+                  </div><div id='commentBox{$value['no']}' class='commentBox'><div id='commentBlock'><ul class='list-group' data-board='{$value['no']}'></ul></div>
                   <div class='input-group'><textarea class='form-control' aria-label='With textarea' id='comment{$value['no']}' placeholder='글을 입력해 주세요.'></textarea>
                   <span class='input-group-text'>";
 
@@ -49,7 +51,16 @@ try {
 
         $html .= "<button type='button' class='btn btn-secondary' onclick='commentEvent(this)' data-board='{$value['no']}'>등록</button></span></div></div></li>";
     }
-
+    if(ceil($totalData['total'] / $totalData['resultOnPage']) > 0) {
+        if($_POST['page'] > 1) {
+            $pev = $_POST['page'] - 1;
+            $html .= "<li class='page-item'><a class='page-link' href='javascript:void(0)' onclick='commentList(this, $pev)'>Previous</a></li>";
+        }
+        if($_POST['page'] < ceil($totalData['total'] / $totalData['resultOnPage'])) {
+            $next = $_POST['page'] + 1;
+            $html .= "<li class='page-item'><a class='page-link' href='javascript:void(0)' onclick='commentList(this, $next)'>Next</a></li>";
+        }
+    }
 
 
     echo json_encode(['status'=>'success', 'message'=>$html]);
