@@ -151,18 +151,39 @@ class Database
     }
 
 
-    public function findOr($tableName, $params)
+    public function findOr($tableName, $params, $type = '')
     {
         try {
-            $sql = implode(" OR ", array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
+            $sql = implode(" OR ", array_map(fn($attr) => "$attr = ?", array_keys($params)));
 
-            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
-            foreach ($params as $key => $item) {
-                $statement->bindValue(":$key", $item);
+            $query = "SELECT * FROM $tableName WHERE $sql";
+
+            $stmt = mysqli_prepare($this->conn, $query);
+            if($stmt === false) {
+                throw new Exception(mysqli_error($this->conn));
             }
 
-            $statement->execute();
-            return $statement->fetchAll();
+            $param = array_values($params);
+
+            $bind = mysqli_stmt_bind_param($stmt, $type, ...$param);
+            if($bind === false) {
+                throw new Exception(mysqli_error($this->conn));
+            }
+
+            $exec = mysqli_stmt_execute($stmt);
+            if($exec === false) {
+                throw new Exception(mysqli_error($this->conn));
+            }
+
+            $result = mysqli_stmt_get_result($stmt);
+            if(!$result) {
+                throw new Exception(mysqli_error($this->conn));
+            }
+            $data = mysqli_fetch_all($result);
+            mysqli_free_result($result);
+            mysqli_stmt_close($stmt);
+
+            return $data;
 
         } catch (Exception $e) {
             return false;
