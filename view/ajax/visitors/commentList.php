@@ -33,11 +33,11 @@ try {
                         <div>";
 
         if($value['user_type'] == 'g') {
-            $html .= '<input type="password" name="boardPassword" style="height: 1.25rem; width: 10rem;" placeholder="password">';
+            $html .= "<input type='password' id='boardPassword{$value["no"]}' name='boardPassword' style='height: 1.25rem; width: 10rem;' placeholder='password'>";
         }
-        $html .=  "<small>수정</small>
+        $html .=  "<small onclick='updateHtml(this)'>수정</small>
                   <small onclick='deleteAction(this)'>삭제</small>
-                  </div></div></div><div>
+                  </div></div></div><div id='contentBox{$value["no"]}'>
                   <p>{$value['content']}</p>
                   </div><div id='commentBox{$value['no']}' class='commentBox'><div id='commentBlock'><ul class='list-group'></ul></div>
                   <div class='input-group'><textarea class='form-control' aria-label='With textarea' id='comment{$value['no']}' placeholder='글을 입력해 주세요.'></textarea>

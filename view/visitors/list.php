@@ -3,10 +3,15 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 
 use app\lib\Database;
+use app\lib\Field;
 
 try {
-    $listData = (new Database)->findAll('tr_visitors_board', ['status'=>'t', 'parents_no'=>0]);
-
+    $page = $_GET['page'] ?? 1;
+    $totalData = (new Database)->list('tr_visitors_board', $page, ['status'=>'t', 'parents_no'=>0]);
+    $listData = $totalData['listData'];
+    unset($totalData['listData']);
+    $totalData['page'] = $page;
+    $btnHtml = Field::listBtn($totalData);
 
 } catch(Exception $e) {
 
@@ -44,7 +49,7 @@ try {
                             <span><?php echo $value['user_name']; ?></span>
                             <div>
                                 <?php if($value['user_type'] == 'g'): ?>
-                                <input type="password" name="boardPassword" style="height: 1.25rem; width: 10rem;" placeholder="password">
+                                <input type="password" id="boardPassword<?php echo $value['no']; ?>" name="boardPassword" style="height: 1.25rem; width: 10rem;" placeholder="password">
                                 <?php endif; ?>
                                 <small onclick="updateHtml(this)">수정</small>
                                 <small onclick="deleteAction(this)">삭제</small>
@@ -80,6 +85,7 @@ try {
             <?php endforeach; ?>
         </ul>
     </div>
+    <?php echo $btnHtml; ?>
 
 </section>
 </body>
@@ -104,7 +110,6 @@ try {
     function commentList(event) {
         // 댓글 카운트 확인 후 없으면 댓글이 없습니다.
         // 있으면 댓글 보여주기
-        console.log('댓글 확인할 보드 NO : ' + event.parentElement.parentElement.dataset.board);
         const board_num = event.parentElement.parentElement.dataset.board;
 
         $.ajax({
@@ -264,12 +269,80 @@ try {
 
     function updateHtml(event) {
         const board_no = event.parentElement.parentElement.dataset.board;
+        const board_type = event.parentElement.parentElement.dataset.type;
+        const user_info = <?php echo json_encode($auth) ?>;
+        if(board_type === 'm' && user_info === false) {
+            window.alert('로그인 후 이용해 주세요.');
+            return;
+        }
+
         const textareaBox = document.querySelector('#contentBox'+board_no);
         const inner_text = textareaBox.firstElementChild.innerHTML;
-        textareaBox.innerHTML = '<div class="input-group"><textarea class="form-control" aria-label="With textarea" placeholder="글을 입력해 주세요."></textarea>' +
-            '<span class="input-group-text"><button type="button" class="btn btn-secondary">수정</button></span></div>';
+        textareaBox.innerHTML = '<div class="input-group"><textarea class="form-control" id="updateText'+board_no+'" aria-label="With textarea" placeholder="글을 입력해 주세요."></textarea>' +
+            '<span class="input-group-text"><button type="button" onclick="updateAction(this)" data-type="'+board_type+'" data-board="'+board_no+'" class="btn btn-secondary">수정</button></span></div>';
 
         textareaBox.firstElementChild.firstElementChild.innerHTML = inner_text;
+    }
+
+    function updateAction(event) {
+        const board_no = event.dataset.board;
+        const board_type = event.dataset.type;
+        const text_data = document.querySelector('#updateText'+board_no).value;
+
+        if(board_type === 'g') {
+            const password = document.querySelector('#boardPassword'+board_no).value;
+            if(password === '') {
+                window.alert('비회원 게시글은 패스워드가 필수 입니다.');
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/view/ajax/visitors/update.php',
+                data: {
+                    board_no: board_no,
+                    text_data: text_data,
+                    board_type: board_type,
+                    password: password
+                },
+                success: result => {
+                    const re_data = JSON.parse(result);
+                    if (re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    }
+                }, error: e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/view/ajax/visitors/update.php',
+                data: {
+                    board_no: board_no,
+                    text_data: text_data,
+                    board_type: board_type
+                },
+                success: result => {
+                    const re_data = JSON.parse(result);
+                    if (re_data.status === 'success') {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    } else {
+                        window.alert(re_data.message);
+                        window.location.reload();
+                    }
+                }, error: e => {
+                    console.log(e);
+                    window.alert('에러가 발생했습니다.')
+                }
+            });
+        }
     }
 
 </script>
