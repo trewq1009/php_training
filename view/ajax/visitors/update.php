@@ -14,7 +14,7 @@ try {
     }
 
     $db = new Database;
-    $boardData = $db->findOne('tr_visitors_board', ['no'=>$_POST['board_no'], 'status'=>'t']);
+    $boardData = $db->findOne('tr_visitors_board', ['no'=>$_POST['board_no'], 'status'=>'t'], 'is');
     if(!$boardData) {
         throw new Exception('게시글이 존재하지 않습니다.');
     }
@@ -35,19 +35,19 @@ try {
             throw new Exception('등록한 회원이 아닙니다.');
         }
     }
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
     $updateBool = $db->update('tr_visitors_board', ['no'=>$_POST['board_no']], ['content'=>$_POST['text_data']]);
     if(!$updateBool) {
         throw new DatabaseException('게시글 수정에 실패했습니다.');
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     echo json_encode(['status'=>'success', 'message'=>'수정이 완료 되었습니다.']);
     die();
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);
 } catch (Exception $e) {
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);

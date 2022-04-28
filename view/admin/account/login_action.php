@@ -15,7 +15,7 @@ try {
         throw new Exception('아이디 형태가 올바르지 않습니다.');
     }
 
-    $adminModel = (new Database)->findOne('tr_account_admin', ['id'=>$_POST['imiId'], 'status'=>'ALIVE']);
+    $adminModel = (new Database)->findOne('tr_account_admin', ['id'=>$_POST['imiId'], 'status'=>'ALIVE'], 'is');
     if(!$adminModel) {
         throw new Exception('존재하지 않는 계정입니다.');
     }

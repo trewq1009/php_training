@@ -6,8 +6,8 @@ use app\lib\Session;
 use app\lib\Database;
 
 try {
-    $userModel = (new Database)->findOne('tr_account', ['no'=>$_GET['userNo']]);
-    $userMileageData = (new Database)->findOne('tr_mileage', ['user_no'=>$_GET['userNo']]);
+    $userModel = (new Database)->findOne('tr_account', ['no'=>$_GET['userNo']], 'i');
+    $userMileageData = (new Database)->findOne('tr_mileage', ['user_no'=>$_GET['userNo']], 'i');
 
 } catch (Exception $e) {
     echo $e->getMessage();

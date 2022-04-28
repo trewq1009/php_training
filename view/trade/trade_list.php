@@ -13,7 +13,7 @@ try {
     $db = new Database;
     $listData = $db->findOr('tr_trade_log', ['seller_no'=>$auth['no'], 'buyer_no'=>$auth['no']]);
     foreach ($listData as $key => $value) {
-        $productData = $db->findOne('tr_product', ['no'=>$value['trade_product_no']]);
+        $productData = $db->findOne('tr_product', ['no'=>$value['trade_product_no']], 'i');
         $listData[$key]['productName'] = $productData['name'];
         if($value['seller_no'] == $auth['no']) {
             $listData[$key]['tradeName'] = '판매';

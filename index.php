@@ -5,7 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 use app\lib\Database;
 
 if($auth) {
-    $mileage = (new Database)->findOne('tr_mileage', ['user_no'=>$auth['no']]);
+    $mileage = (new Database)->findOne('tr_mileage', ['user_no'=>$auth['no']], 'i');
 }
 
 ?>

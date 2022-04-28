@@ -9,10 +9,10 @@ try {
         throw new Exception('잘못된 경로 입니다.');
     }
     $db = new Database;
-    $boardData = $db->findOne('tr_board', ['no'=>$_GET['boardNo']]);
-    $productData = $db->findOne('tr_product', ['no'=>$boardData['reference_no']]);
-    $imageData = $db->findOne('tr_image', ['no'=>$productData['image_no']]);
-    $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$boardData['no']]);
+    $boardData = $db->findOne('tr_board', ['no'=>$_GET['boardNo']], 'i');
+    $productData = $db->findOne('tr_product', ['no'=>$boardData['reference_no']], 'i');
+    $imageData = $db->findOne('tr_image', ['no'=>$productData['image_no']], 'i');
+    $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$boardData['no']], 'i');
 
 } catch (Exception $e) {
     $message = $e->getMessage();

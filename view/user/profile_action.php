@@ -21,7 +21,7 @@ try {
             }
             $postData['userPw'] = password_hash($postData['userPw'], PASSWORD_BCRYPT);
         } else {
-            $userModel = $db->findOne('tr_account', ['no'=>$auth['no']]);
+            $userModel = $db->findOne('tr_account', ['no'=>$auth['no']], 'i');
             $postData['userPw'] = $userModel['password'];
         }
         if (empty($postData['userName'])) {
@@ -34,26 +34,26 @@ try {
         }
 
 
-        $db->pdo->beginTransaction();
+        mysqli_autocommit($db->conn, FALSE);
 
-        if (!$db->update('tr_account', ['no' => $auth['no']], ['name' => $postData['userName'], 'password' => $postData['userPw']])) {
+        if (!$db->update('tr_account', ['no' => $auth['no']], ['name' => $postData['userName'], 'password' => $postData['userPw']], 'ssi')) {
             throw new DatabaseException('정보 수정에 실패했습니다.');
         }
 
-        $db->pdo->commit();
+        mysqli_commit($db->conn);
 
-        $afterUserData = $db->findOne('tr_account', ['no' => $auth['no']]);
+        $afterUserData = $db->findOne('tr_account', ['no' => $auth['no']], 'i');
         Session::setSession('auth', ['no' => $afterUserData['no'], 'name' => $afterUserData['name']]);
         $message = '정보 수정이 완료 되었습니다.';
 
     } else if($_POST['action'] === 'delete') {
 
-        $db->pdo->beginTransaction();
+        mysqli_autocommit($db->conn, FALSE);
         if(!$db->update('tr_account', ['no' => $auth['no']], ['status' => 'a'])) {
             throw new DatabaseException('회원 탈퇴 신청을 실패하였습니다.');
         }
 
-        $db->pdo->commit();
+        mysqli_commit($db->conn);
 
         Session::removeSession('auth');
         $message = '회원 탈퇴 신청이 완료 되었습니다.';
@@ -68,7 +68,7 @@ try {
     }
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
@@ -80,7 +80,7 @@ try {
     <div class="alert alert-success">
         <?php echo $message ?>
     </div>
-    <a herf="/" class="btn btn-secondary">홈</a>
+    <a href="/" class="btn btn-secondary">홈</a>
 
 </section>
 </body>

@@ -9,6 +9,21 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/config/config.php';
 
 class Database
 {
+//    public PDO $pdo;
+//    public function __construct()
+//    {
+//        // 생성시 디비 연결 후 테스트 까지
+//        // 미 연결시 디비 오류
+//        try {
+//            $host = DB_HOST;
+//            $user = DB_USER;
+//            $password = DB_PASSWORD;
+//
+//            $this->pdo = new PDO($host, $user, $password, [PDO::MYSQL_ATTR_FOUND_ROWS => true]);
+//        } catch (\PDOException | Exception $e) {
+//            die($e->getMessage());
+//        }
+//    }
     public $conn;
     public function __construct()
     {
@@ -36,39 +51,55 @@ class Database
         }
     }
 
-    public function save($tableName, $params, $type)
+    public function save($tableName, $params)
     {
         try {
-            $columns = implode(' , ', array_keys($params));
-            $sqlValue = implode(',', array_map(fn($attr) => "?", $params));
+            $columns = array_keys($params);
+            $sqlValue = array_map(fn($attr) => ":$attr", $columns);
 
-            $query = "INSERT INTO $tableName ($columns) VALUE ($sqlValue)";
+            $statement = $this->pdo->prepare("INSERT INTO $tableName (".implode(' , ', $columns).") VALUE (".implode(',', $sqlValue).")");
 
-            $stmt = mysqli_prepare($this->conn, $query);
-            if($stmt === false) {
-                throw new Exception(mysqli_error($this->conn));
+            foreach ($columns as $item) {
+                $statement->bindValue(":$item", $params[$item]);
             }
 
-            $param = array_values($params);
-            $bind = mysqli_stmt_bind_param($stmt, $type, ...$param);
-            if($bind === false) {
-                throw new Exception(mysqli_error($this->conn));
+            $statement->execute();
+
+            // sql 문이 성공하면 1반환
+            $result = $statement->rowCount();
+
+            if($result == 0) {
+                throw new Exception();
             }
 
-            $exec = mysqli_stmt_execute($stmt);
-            if($exec === false) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-
-            $resultNo = mysqli_insert_id($this->conn);
-            mysqli_stmt_close($stmt);
-
-            return $resultNo;
+            return $this->pdo->lastInsertId();
 
         } catch (\Exception $e) {
             return false;
         }
     }
+
+
+//    public function findOne($tableName, $params, $option = '')
+//    {
+//        try {
+//            $sqlWhere = array_keys($params);
+//            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", $sqlWhere));
+//
+//            $sql .= " $option";
+//
+//            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql");
+//            foreach ($sqlWhere as $item) {
+//                $statement->bindValue(":$item", $params[$item]);
+//            }
+//
+//            $statement->execute();
+//            return $statement->fetch();
+//
+//        } catch (Exception $e) {
+//            return false;
+//        }
+//    }
 
     public function findOne($tableName, $params, $type, $option = '') {
         try {
@@ -111,39 +142,19 @@ class Database
     }
 
 
-    public function findAll($tableName, $params, $type)
+    public function findAll($tableName, $params)
     {
         try {
-            $sql = implode(" AND ", array_map(fn($attr) => "$attr = ?", array_keys($params)));
 
-            $query = "SELECT * FROM $tableName WHERE $sql ORDER BY no DESC";
+            $sql = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
 
-            $stmt = mysqli_prepare($this->conn, $query);
-            if($stmt === false) {
-                throw new Exception(mysqli_error($this->conn));
+            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $sql ORDER BY no DESC");
+            foreach ($params as $key => $item) {
+                $statement->bindValue(":$key", $item);
             }
 
-            $param = array_values($params);
-
-            $bind = mysqli_stmt_bind_param($stmt, $type, ...$param);
-            if($bind === false) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-
-            $exec = mysqli_stmt_execute($stmt);
-            if($exec === false) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-
-            $result = mysqli_stmt_get_result($stmt);
-            if(!$result) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-            $data = mysqli_fetch_all($result);
-            mysqli_free_result($result);
-            mysqli_stmt_close($stmt);
-
-            return $data;
+            $statement->execute();
+            return $statement->fetchAll();
 
         } catch (Exception $e) {
             return false;
@@ -170,41 +181,40 @@ class Database
     }
 
 
-    public function update ($tableName, $where, $params, $type = '')
+    public function update ($tableName, $where, $params)
     {
         try {
-            $setValue = implode(' , ', array_map(fn($attr) => "$attr = ?", array_keys($params)));
+            $setValue = implode(' , ', array_map(fn($attr) => "$attr = :$attr", array_keys($params)));
+
+            $setValue = $setValue.', update_date = :update_date';
+
+            $setWhere = implode(" AND ", array_map(fn($attr) => "$attr = :$attr", array_keys($where)));
+
+            $statement = $this->pdo->prepare("UPDATE $tableName SET $setValue WHERE $setWhere");
+
+            // value bind
+            foreach ($params as $key => $value) {
+                $statement->bindValue(":$key", $value);
+            }
 
             // updated Date
-            $setValue = $setValue.", update_date = default";
+            $date = new DateTime("NOW");
+            $timeStamp = $date->format('Y-m-d H:i:s');
+            $statement->bindValue(':update_date', $timeStamp);
 
-            $setWhere = implode(" AND ", array_map(fn($attr) => "$attr = ?", array_keys($where)));
-
-            $query = "UPDATE $tableName SET $setValue WHERE $setWhere";
-
-            $stmt = mysqli_prepare($this->conn, $query);
-            if($stmt === false) {
-                throw new Exception(mysqli_error($this->conn));
+            // where bind
+            foreach ($where as $key => $value) {
+                $statement->bindValue(":$key", $value);
             }
 
-            $param = array_merge(array_values($params), array_values($where));
+            $statement->execute();
 
-            $bind = mysqli_stmt_bind_param($stmt, $type, ...$param);
-            if($bind === false) {
-                throw new Exception(mysqli_error($this->conn));
+            // result 1 success
+            $result = $statement->rowCount();
+
+            if($result == 0) {
+                throw new Exception();
             }
-
-            $exec = mysqli_stmt_execute($stmt);
-            if($exec === false) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-
-            $resultRow = mysqli_stmt_affected_rows($stmt);
-            if($resultRow == 0) {
-                throw new Exception(mysqli_error($this->conn));
-            }
-
-            mysqli_stmt_close($stmt);
 
             return true;
         } catch (Exception $e) {
@@ -236,10 +246,10 @@ class Database
             $listData = $statement->fetchAll();
 
             return [
-              'total' => $total['count'],
-              'resultOnPage' => $resultOnPage,
-              'calcPage' =>  $calcPage,
-              'listData' => $listData
+                'total' => $total['count'],
+                'resultOnPage' => $resultOnPage,
+                'calcPage' =>  $calcPage,
+                'listData' => $listData
             ];
 
         } catch (\Exception $e) {

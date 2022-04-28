@@ -33,12 +33,12 @@ try {
     // DB on
     $db = new Database;
 
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'FOR UPDATE');
+    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'i', 'FOR UPDATE');
 
     $withdrawalLogNo = $db->save('tr_withdrawal_log', ['user_no'=>$auth['no'], 'withdrawal_mileage'=>$_POST['drawalMileage'], 'bank_name'=>$_POST['bankValue'],
-                        'bank_account_number'=>Utils::encrypt($_POST['bankNumber']), 'status'=>'await']);
+                        'bank_account_number'=>Utils::encrypt($_POST['bankNumber']), 'status'=>'await'], 'iiss');
 
     if(!$withdrawalLogNo) {
         throw new DatabaseException('출금 신청에 실패했습니다.');
@@ -46,7 +46,7 @@ try {
 
     // 마일리지 변동 DB
     $mileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$auth['no'], 'method'=>'withdrawal', 'method_no'=>$withdrawalLogNo, 'before_mileage'=>$userMileageModel['use_mileage'],
-                                            'use_mileage'=>$_POST['drawalMileage'], 'after_mileage'=>$userMileageModel['use_mileage'] - $_POST['drawalMileage']]);
+                                            'use_mileage'=>$_POST['drawalMileage'], 'after_mileage'=>$userMileageModel['use_mileage'] - $_POST['drawalMileage']], 'isiiii');
 
     if(!$mileageLogNo) {
         throw new DatabaseException('마일리지 변동에 실패했습니다.');
@@ -61,11 +61,11 @@ try {
     }
 
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     $message = '출금 신청이 완료되었습니다.';
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (CustomException $e) {
     $e->setErrorMessages($e);

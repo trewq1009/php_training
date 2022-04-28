@@ -46,36 +46,36 @@ try {
     }
 
 
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
     // image DB insert
-    $imgNo = $db->save('tr_image', ['image_name' => $fileName, 'image_path' => '/upload/']);
+    $imgNo = $db->save('tr_image', ['image_name' => $fileName, 'image_path' => '/upload/'], 'ss');
     if (!$imgNo) {
         throw new DatabaseException('이미지 저장에 실패했습니다.');
     }
 
     // product DB insert
     $productNo = $db->save('tr_product', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'name'=>$_POST['productName'], 'information'=>$_POST['productInformation'],
-                        'before_price'=>$_POST['productPrice'], 'commission'=>$_POST['productCommission'], 'after_price'=>$_POST['productRealPrice']]);
+                        'before_price'=>$_POST['productPrice'], 'commission'=>$_POST['productCommission'], 'after_price'=>$_POST['productRealPrice']], 'iissiii');
     if(!$productNo) {
         throw new DatabaseException('상품 저장에 실패 했습니다.');
     }
 
     // board DB insert
     $boardNo = $db->save('tr_board', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'board_type'=>'trade', 'reference_no'=>$productNo, 'status'=>'ALIVE']);
+                        'board_type'=>'trade', 'reference_no'=>$productNo, 'status'=>'ALIVE'], 'iisssis');
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     header('Location: /view/trade/list.php');
     exit();
 
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (Exception $e) {
     $message = $e->getMessage();

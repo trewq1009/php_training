@@ -34,7 +34,7 @@ try {
                 throw new Exception('아이디 형태가 올바르지 않습니다.');
             }
             // DB 중복 확인
-            if ($db->findOne('tr_account', ['id' => $inputData])) {
+            if ($db->findOne('tr_account', ['id' => $inputData], 's')) {
                 throw new Exception('중복된 아이디 입니다.');
             }
         }
@@ -58,7 +58,7 @@ try {
             if(!filter_var($inputData, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception('이메일 형식에 맞지 않습니다.');
             }
-            if ($db->findOne('tr_account', ['email' => $inputData])) {
+            if ($db->findOne('tr_account', ['email' => $inputData], 's')) {
                 throw new Exception('중복된 이메일 입니다.');
             }
         }
@@ -66,21 +66,21 @@ try {
     }
 
     // 트렌 시작
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
     // 회원정보 저장
-    $userNo = $db->save('tr_account', ['id'=>$rebuildData['userId'], 'password'=>$rebuildData['userPw'], 'name'=>$rebuildData['userName'], 'email'=>$rebuildData['userEmail']]);
+    $userNo = $db->save('tr_account', ['id'=>$rebuildData['userId'], 'password'=>$rebuildData['userPw'], 'name'=>$rebuildData['userName'], 'email'=>$rebuildData['userEmail']], 'ssss');
     if(!$userNo) {
         throw new DatabaseException('회원가입 실패했습니다. 다시 시도해 주세요');
     }
 
     // 회원 마일리지 로그 테이블
-    if(!$db->save('tr_mileage_log', ['user_no'=>$userNo, 'method'=>'join'])) {
+    if(!$db->save('tr_mileage_log', ['user_no'=>$userNo, 'method'=>'join'], 'is')) {
         throw new DatabaseException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
     }
 
     // 회원 마일리지 테이블
-    if(!$db->save('tr_mileage', ['user_no'=>$userNo])) {
+    if(!$db->save('tr_mileage', ['user_no'=>$userNo], 'i')) {
         throw new DatabaseException('마일리지 로그 테이블 등록에 실패했습니다. 다시 시도해 주세요.');
     }
 
@@ -90,11 +90,11 @@ try {
     }
 
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     $message = '회원가입 신청 되었습니다. 이메일 인증을 통해 완료 해주세요.';
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (\Exception $e) {
     $message = $e->getMessage();

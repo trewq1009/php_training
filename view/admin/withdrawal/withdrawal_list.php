@@ -8,7 +8,7 @@ use app\lib\Database;
 try {
     $withdrawalList = (new Database)->findAll('tr_withdrawal_log', ['status'=>'await']);
     foreach ($withdrawalList as $key => $value) {
-        $userModel = (new Database)->findOne('tr_account', ['no'=>$value['user_no']]);
+        $userModel = (new Database)->findOne('tr_account', ['no'=>$value['user_no']], 'i');
         $withdrawalList[$key]['name'] = $userModel['name'];
         $withdrawalList[$key]['id'] = $userModel['id'];
         $withdrawalList[$key]['status'] = '출금신청';

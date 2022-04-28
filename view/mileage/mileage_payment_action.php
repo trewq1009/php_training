@@ -66,9 +66,9 @@ try {
     }
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'FOR UPDATE');
+    $userMileageModel = $db->findOne('tr_mileage', ['user_no'=>$auth['no']], 'i', 'FOR UPDATE');
 
     $information = [
         'card_validity' => Utils::encrypt(date("Y-m", strtotime($cardDate))),
@@ -77,7 +77,7 @@ try {
 
     // 결제 로그 저장
     $paymentLogNo = $db->save('tr_payment_log', ['user_no'=>$auth['no'], 'method'=>'credit', 'payment_mileage'=>$postData['price'],
-                            'payment_information'=>json_encode($information), 'status'=>'success', 'cancels'=>json_encode(['cancel'=>0])]);
+                            'payment_information'=>json_encode($information), 'status'=>'success', 'cancels'=>json_encode(['cancel'=>0])], 'isisss');
 
     if(!$paymentLogNo) {
         throw new DatabaseException();
@@ -85,7 +85,7 @@ try {
 
     // 마일리지 변동 로그 저장
     $mileageLogNo = $db->save('tr_mileage_log', ['user_no'=>$auth['no'], 'method'=>'payment', 'method_no'=>$paymentLogNo, 'before_mileage'=>$userMileageModel['use_mileage'],
-                            'use_mileage'=>$postData['price'], 'after_mileage'=>$userMileageModel['use_mileage'] + $postData['price']]);
+                            'use_mileage'=>$postData['price'], 'after_mileage'=>$userMileageModel['use_mileage'] + $postData['price']], 'isiiii');
 
     if(!$mileageLogNo) {
         throw new DatabaseException('마일리지 변동 로그 저장 실패했습니다.');
@@ -100,14 +100,14 @@ try {
     }
 
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     $message = '결재가 완료 되었습니다.';
 
 
 } catch (CustomException $e) {
     $e->setErrorMessages($e);
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (PaymentException $e) {
     $e->setErrorMessages($e);

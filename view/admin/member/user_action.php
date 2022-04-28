@@ -16,7 +16,7 @@ try {
 
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
     if($_POST['action'] == 'update') {
         if(!$db->update('tr_account', ['no'=>$_POST['userNo']], ['name'=>$_POST['userName']])) {
             throw new DatabaseException('회원정보 변경에 실패했습니다.');
@@ -27,13 +27,13 @@ try {
         }
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     Session::setSession('success', '회원 정보 수정에 성공하였습니다.');
     header('Location: ./user_list.php');
     exit();
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     Session::setSession('error', $e->getMessage());
     header('Location: ./user_list.php');
 } catch (Exception $e) {

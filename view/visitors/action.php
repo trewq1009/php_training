@@ -20,24 +20,26 @@ try {
             throw new Exception('게스트는 글 등록시 패스워드 필수 입니다.');
         }
         $params = ['user_type'=>'g', 'visitors_password'=>password_hash($_POST['visitorsPassword'], PASSWORD_BCRYPT), 'content'=>$content];
+        $dbType = 'sss';
     } else {
         $params = ['user_type'=>'m', 'user_no'=>$auth['no'], 'user_name'=>$auth['name'], 'content'=>$content];
+        $dbType = 'siss';
     }
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $boardNo = $db->save('tr_visitors_board', $params);
+    $boardNo = $db->save('tr_visitors_board', $params, $dbType);
     if(!$boardNo) {
         throw new DatabaseException('방명록 등록에 실패했습니다.');
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     header("Location: $preUrl");
     exit();
     
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (Exception $e) {
     $message = $e->getMessage();

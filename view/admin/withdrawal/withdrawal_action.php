@@ -15,9 +15,9 @@ try {
     }
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $withdrawalLogData = $db->findOne('tr_withdrawal_log', ['no'=>$_POST['logNo']], 'FOR UPDATE');
+    $withdrawalLogData = $db->findOne('tr_withdrawal_log', ['no'=>$_POST['logNo']], 'i', 'FOR UPDATE');
 
     if($withdrawalLogData['user_no'] != $_POST['userNo']) {
         throw new DatabaseException('회원정보가 다릅니다.');
@@ -27,7 +27,7 @@ try {
         throw new DatabaseException('로그 변경에 실패하였습니다.');
     }
 
-    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$_POST['userNo']], 'FOR UPDATE');
+    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$_POST['userNo']], 'i', 'FOR UPDATE');
 
     if($userMileageData['using_mileage'] < $withdrawalLogData['withdrawal_mileage']) {
         throw new DatabaseException('금액이 맞지 않습니다.');
@@ -43,7 +43,7 @@ try {
     header('Location: ./withdrawal_list.php');
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
     header('Location: ./withdrawal_list.php');
 } catch (Exception $e) {

@@ -13,9 +13,9 @@ try {
     }
 
     $db = new Database;
-    $withdrawalData = $db->findOne('tr_withdrawal_log', ['no'=>$_GET['viewDetail']]);
-    $userModel = $db->findOne('tr_account', ['no'=>$withdrawalData['user_no']]);
-    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$userModel['no']]);
+    $withdrawalData = $db->findOne('tr_withdrawal_log', ['no'=>$_GET['viewDetail']], 'i');
+    $userModel = $db->findOne('tr_account', ['no'=>$withdrawalData['user_no']], 'i');
+    $userMileageData = $db->findOne('tr_mileage', ['user_no'=>$userModel['no']], 'i');
 
     $bankInfo = Utils::decrypt($withdrawalData['bank_account_number']);
 

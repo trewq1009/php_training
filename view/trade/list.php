@@ -17,10 +17,10 @@ try {
         $listBtn = Field::listBtn($listData);
 
         foreach ($boardList as $key => $value) {
-            $productData = $db->findOne('tr_product', ['no'=>$value['reference_no']]);
+            $productData = $db->findOne('tr_product', ['no'=>$value['reference_no']], 'i');
             $boardList[$key]['productName'] = $productData['name'];
             $boardList[$key]['price'] = $productData['before_price'];
-            $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$value['no']]);
+            $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$value['no']], 'i');
             $boardList[$key]['tradeStatus'] = $tradeLogData['status'] ?? false;
         }
     }

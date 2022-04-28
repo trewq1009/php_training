@@ -9,11 +9,11 @@ try {
     if(!$auth) {
         throw new CustomException('잘못된 경로 입니다.');
     }
-    $userModel = (new Database)->findOne('tr_account', ['no'=>$auth['no']]);
+    $userModel = (new Database)->findOne('tr_account', ['no'=>$auth['no']], 'i');
     if(!$userModel) {
         throw new CustomException('회원 정보가 없습니다.');
     }
-    $userMileage = (new Database)->findOne('tr_mileage', ['user_no'=>$userModel['no']]);
+    $userMileage = (new Database)->findOne('tr_mileage', ['user_no'=>$userModel['no']], 'i');
     if(!$userMileage) {
         throw new CustomException('마일리지를 정보를 가져올 수 없습니다.');
     }

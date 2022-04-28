@@ -15,7 +15,7 @@ try {
         if(empty($_POST['password'])) {
             throw new Exception('패스워드는 필수 입니다.');
         }
-        $boardData = $db->findOne('tr_visitors_board', ['no'=>$_POST['board_no']], 'FOR UPDATE');
+        $boardData = $db->findOne('tr_visitors_board', ['no'=>$_POST['board_no']], 'i','FOR UPDATE');
         if(!$boardData) {
             throw new Exception('게시글에 대한 정보가 없습니다.');
         }
@@ -29,7 +29,7 @@ try {
         }
         $auth = $_SESSION['auth'] ?? false;
 
-        $boardData = $db->findOne('tr_visitors_board', ['no' => $_POST['board_no']], 'FOR UPDATE');
+        $boardData = $db->findOne('tr_visitors_board', ['no' => $_POST['board_no']], 'i','FOR UPDATE');
         if (!$boardData) {
             throw new Exception('게시글에 대한 정보가 없습니다.');
         }
@@ -39,7 +39,7 @@ try {
 
     }
 
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
     $result = $db->update('tr_visitors_board', ['no' => $_POST['board_no']], ['status' => 'f']);
 
     if (!$result) {
@@ -47,19 +47,19 @@ try {
     }
 
     if($boardData['parents_no'] != 0) {
-        $parentsData = $db->findOne('tr_visitors_board', ['no'=>$boardData['parents_no']], 'FOR UPDATE');
+        $parentsData = $db->findOne('tr_visitors_board', ['no'=>$boardData['parents_no']], 'i', 'FOR UPDATE');
         $parentsBool = $db->update('tr_visitors_board', ['no'=>$boardData['parents_no']], ['comment_count'=>$parentsData['comment_count'] - 1]);
         if(!$parentsBool) {
             throw new DatabaseException('작업에 실패하였습니다.');
         }
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     echo json_encode(['status' => 'success', 'message' => '성공했습니다.']);
     exit();
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);
 } catch (Exception $e) {
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);

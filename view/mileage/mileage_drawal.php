@@ -9,7 +9,7 @@ try {
         throw new Exception('잘못된 경로 입니다.');
     }
     $db = new Database;
-    $mileageModel = $db->findone('tr_mileage', ['user_no'=>$auth['no']]);
+    $mileageModel = $db->findone('tr_mileage', ['user_no'=>$auth['no']], 'i');
 
 } catch (Exception $e) {
     $message = $e->getMessage();

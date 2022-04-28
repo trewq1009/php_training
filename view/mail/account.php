@@ -12,9 +12,9 @@ try {
     }
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $userData = $db->findOne('tr_account', ['no'=>$_GET['training'], 'status'=>'t']);
+    $userData = $db->findOne('tr_account', ['no'=>$_GET['training'], 'status'=>'t'], 'is');
     if(!$userData) {
         throw new Exception('올바른 회원이 아닙니다.');
     }
@@ -26,11 +26,11 @@ try {
         throw new DatabaseException('회원 활성화에 실패하였습니다.');
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     $message = '이메일 인증에 성공하였습니다. 로그인 해주세요.';
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
 } catch (Exception $e) {
     $message = $e->getMessage();

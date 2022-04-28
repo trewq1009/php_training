@@ -23,19 +23,21 @@ try {
             throw new Exception('게스트 댓글은 패스워드가 필수 입니다.');
         }
         $params = ['user_type'=>'g', 'user_name'=>'게스트', 'visitors_password'=>password_hash($_POST['comment_password'], PASSWORD_BCRYPT), 'parents_no'=>$_POST['parent_no'], 'content'=>$_POST['comment']];
+        $dbType = 'sssis';
     } else {
         $params = ['user_type'=>'m', 'user_no'=>$auth['no'], 'user_name'=>$auth['name'], 'parents_no'=>$_POST['parent_no'], 'content'=>$_POST['comment']];
+        $dbType = 'sisis';
     }
 
     $db = new Database;
-    $db->pdo->beginTransaction();
+    mysqli_autocommit($db->conn, FALSE);
 
-    $saveResult = $db->save('tr_visitors_board', $params);
+    $saveResult = $db->save('tr_visitors_board', $params, $dbType);
     if(!$saveResult) {
         throw new DatabaseException('댓글 등록에 실패했습니다.');
     }
 
-    $parentsData = $db->findOne('tr_visitors_board', ['no'=>$_POST['parent_no'], 'status'=>'t'], 'FOR UPDATE');
+    $parentsData = $db->findOne('tr_visitors_board', ['no'=>$_POST['parent_no'], 'status'=>'t'], 'is', 'FOR UPDATE');
     if(empty($parentsData)) {
         throw new DatabaseException('댓글 등록에 실패했습니다.');
     }
@@ -47,15 +49,15 @@ try {
 
     // mail 발송
     if(!empty($parentsData['user_no'])) {
-        $parentsUser = $db->findOne('tr_account', ['no'=>$parentsData['user_no']]);
+        $parentsUser = $db->findOne('tr_account', ['no'=>$parentsData['user_no']], 'i');
         $mailBool = (new MailSend)->sendCommentEmail($parentsUser);
     }
 
-    $db->pdo->commit();
+    mysqli_commit($db->conn);
     echo json_encode(['status'=>'success', 'message'=>'댓글 등록이 완료 되었습니다.']);
 
 } catch (DatabaseException $e) {
-    $db->pdo->rollBack();
+    mysqli_rollback($db->conn);
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);
 } catch (Exception $e) {
     echo json_encode(['status'=>'fail', 'message'=>$e->getMessage()]);
