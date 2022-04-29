@@ -42,9 +42,11 @@ try {
         if($tradeLogData['buyer_trade_status'] == 'ongoing') {
             $params = ['seller_trade_status' => 'success', 'seller_status_date'=>$timeStamp];
             $mileageFlag = false;
+            $dbType = 'sdi';
         } else {
             $params = ['seller_trade_status'=>'success', 'seller_status_date'=>$timeStamp, 'trade_success_date'=>$timeStamp,'status'=>'success'];
             $mileageFlag = true;
+            $dbType = 'sddsi';
         }
     } else {
         if($tradeLogData['buyer_no'] != $auth['no']) {
