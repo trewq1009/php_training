@@ -8,8 +8,6 @@ const HOST_NAME = 'localhost';
 const DB_PORT = '33066';
 const DB_NAME = 'training';
 
-
-
 // 회사
 const DB_USER = 'root';
 const DB_PASSWORD = 'kjk100(';
