@@ -16,14 +16,6 @@ try {
         unset($listData['listData']);
         $listData['page'] = $page;
         $listBtn = Field::listBtn($listData);
-
-        foreach ($boardList as $key => $value) {
-            $productData = $db->findOne('tr_product', ['no'=>$value['reference_no']], 'i');
-            $boardList[$key]['productName'] = $productData['name'];
-            $boardList[$key]['price'] = $productData['before_price'];
-            $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$value['no']], 'i');
-            $boardList[$key]['tradeStatus'] = $tradeLogData['status'] ?? false;
-        }
     }
 
 } catch (Exception $e) {
@@ -49,17 +41,6 @@ try {
                         <span><?php echo $item['price'] ?> 원</span>
                     </div>
                     <div class="d-flex w-100 justify-content-between">
-                        <p class="mb-1"><?php echo $item['productName'] ?></p>
-                        <?php if($item['tradeStatus']): ?>
-                            <?php if($item['tradeStatus'] == 'ongoing'): ?>
-                                <span>거래중</span>
-                            <?php elseif($item['tradeStatus'] == 'success') : ?>
-                                <span>거래 완료</span>
-                            <?php endif ?>
-                        <?php endif ?>
-                    </div>
-                    <div class="d-flex w-100 justify-content-between">
-                        <small><?php echo $item['content'] ?></small>
                         <small><?php echo $item['registration_date'] ?></small>
                     </div>
                 </a>

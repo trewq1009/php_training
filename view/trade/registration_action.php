@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+
 
 use app\lib\Database;
 use app\lib\Utils;
@@ -9,10 +9,15 @@ use app\lib\exception\DatabaseException;
 // db connect
 $db = new Database;
 try {
+    if(!session_id()) {
+        session_start();
+    }
+    $auth = $_SESSION['auth'] ?? false;
+
     $preUrl = $_SERVER['HTTP_REFERER'];
     $commission = 0.05;
 
-    if (empty($_POST['boardName']) || empty($_POST['productPrice']) || empty($_POST['productInformation'])) {
+    if (empty($_POST['boardName']) || empty($_POST['productPrice']) || empty($_POST['productInformation']) || empty($_POST['productName'])) {
         throw new Exception('필수 데이터를 입력해 주세요');
     }
     if ($_POST['productPrice'] < 1000) {
@@ -46,7 +51,7 @@ try {
 
     // board DB insert
     $boardNo = $db->save('tr_trade_board', ['user_no'=>$auth['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'price'=>$_POST['productPrice'], 'status'=>'t'], 'iissis');
+                        'price'=>$_POST['productPrice'], 'product_name'=>$_POST['productName'], 'status'=>'t'], 'iississ');
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }

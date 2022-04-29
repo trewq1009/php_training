@@ -1,12 +1,17 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/head.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 
 use app\lib\Database;
 use app\lib\exception\DatabaseException;
 
 try {
-    if(empty($_POST['boardNo']) || empty($_POST['seller']) || empty($_POST['price']) || empty($_POST['productNo'])) {
+    if(!session_id()) {
+        session_start();
+    }
+    $auth = $_SESSION['auth'] ?? false;
+    $preUrl = $_SERVER['HTTP_REFERER'];
+
+    if(empty($_POST['boardNo']) || empty($_POST['seller']) || empty($_POST['price'])) {
         throw new Exception('잘못된 경로 입니다.');
     }
     if($auth['no'] == $_POST['seller']) {
@@ -26,28 +31,15 @@ try {
         throw new DatabaseException('사용할 수 있는 마일리지가 부족합니다. 충전해 주세요');
     }
 
-
-    // board validation
-    $boardData = $db->findOne('tr_board', ['no'=>$_POST['boardNo']], 'i');
-    if($boardData['reference_no'] != $_POST['productNo']) {
-        throw new DatabaseException('데이터가 변경 되었습니다.');
-    }
-
     // product validation
-    $productData = $db->findOne('tr_product', ['no'=>$_POST['productNo']], 'i');
-    if($productData['before_price'] != $_POST['price']) {
+    $boardData = $db->findOne('tr_trade_board', ['no'=>$_POST['boardNo']], 'i');
+    if($boardData['price'] != $_POST['price']) {
         throw new DatabaseException('가격이 변경 되었습니다.');
     }
 
-    $tradeLogData = $db->findOne('tr_trade_log', ['trade_board_no'=>$_POST['boardNo']], 'i');
-    if(!empty($tradeLogData)) {
-        throw new DatabaseException('이미 거래가 예정되었습니다.');
-    }
-
-
     // trade log insert
-    $tradeLogNo = $db->save('tr_trade_log', ['trade_board_no'=>$_POST['boardNo'], 'trade_product_no'=>$_POST['productNo'], 'seller_no'=>$_POST['seller'],
-                                        'buyer_no'=>$auth['no'], 'trade_price'=>$_POST['price'], 'status'=>'ongoing'], 'iiiiis');
+    $tradeLogNo = $db->save('tr_trade_log', ['trade_board_no'=>$_POST['boardNo'], 'seller_no'=>$_POST['seller'],
+                                        'buyer_no'=>$auth['no'], 'trade_price'=>$_POST['price'], 'status'=>'a'], 'iiiis');
 
     if(!$tradeLogNo) {
         throw new DatabaseException('로그 저장에 실패했습니다.');
@@ -69,7 +61,7 @@ try {
     if($differenceMileage < $userMileageData['real_mileage']) {
         $mileageUpdateBool = $db->update('tr_mileage', ['use_mileage'=>$differenceMileage, 'real_mileage'=>$differenceMileage, 'using_mileage'=>$usingMileage], ['user_no'=>$auth['no']], 'iiii');
     } else {
-        $mileageUpdateBool = $db->update('tr_mileage', ['use_mileage'=>$differenceMileage, 'using_mileage'=>$userMileageData], ['user_no'=>$auth['no']], 'iii');
+        $mileageUpdateBool = $db->update('tr_mileage', ['use_mileage'=>$differenceMileage, 'using_mileage'=>$usingMileage], ['user_no'=>$auth['no']], 'iii');
     }
 
     // mileage update boolean

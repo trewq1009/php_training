@@ -82,9 +82,9 @@ CREATE TABLE tr_payment_log
     `user_no`              BIGINT         NOT NULL    DEFAULT 0 COMMENT '유저 PK',
     `method`               VARCHAR(10)    NOT NULL    DEFAULT '' COMMENT '결제 수단(credit:카드, phone:휴대전화, voucher:상품권)',
     `payment_mileage`      INT            NOT NULL    DEFAULT 0 COMMENT '충전 마일리지',
-    `payment_information`  JSON           NOT NULL    DEFAULT '' COMMENT '결제 상세 내역',
+    `payment_information`  JSON           NOT NULL    DEFAULT ('{}') COMMENT '결제 상세 내역',
     `status`               CHAR(1)        NOT NULL    DEFAULT 't' COMMENT '결제 상태(성공:t, 실패:f)',
-    `cancels`              JSON           NOT NULL    DEFAULT '' COMMENT '결제 실패 내역',
+    `cancels`              JSON           NOT NULL    DEFAULT ('{}') COMMENT '결제 실패 내역',
     `registration_date`    TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '결제 신청 일자',
      PRIMARY KEY (no)
 );
@@ -175,10 +175,10 @@ CREATE TABLE tr_trade_log
     `buyer_trade_status`   CHAR(1)      NOT NULL    DEFAULT 'a' COMMENT '구매자 거래 상태(t:거래 완료, a:거래중)',
     `trade_price`          INT          NOT NULL    DEFAULT 0 COMMENT '거래 가격',
     `status`               CHAR(1)      NOT NULL    DEFAULT 'a' COMMENT '거래 상태(t:완료, c:취소, a:진행중)',
-    `seller_status_date`   TIMESTAMP    NOT NULL    DEFAULT '' COMMENT '판매자 거래 상태 변경 일자',
-    `buyer_status_date`    TIMESTAMP    NOT NULL    DEFAULT '' COMMENT '구매자 거래 상태 변경 일자',
-    `trade_success_date`   TIMESTAMP    NOT NULL    DEFAULT '' COMMENT '거래 성공 일자',
-    `trade_cancel_date`    TIMESTAMP    NOT NULL    DEFAULT '' COMMENT '거래 취소 일자',
+    `seller_status_date`   TIMESTAMP    NOT NULL    DEFAULT 0 COMMENT '판매자 거래 상태 변경 일자',
+    `buyer_status_date`    TIMESTAMP    NOT NULL    DEFAULT 0 COMMENT '구매자 거래 상태 변경 일자',
+    `trade_success_date`   TIMESTAMP    NOT NULL    DEFAULT 0 COMMENT '거래 성공 일자',
+    `trade_cancel_date`    TIMESTAMP    NOT NULL    DEFAULT 0 COMMENT '거래 취소 일자',
     `registration_date`    TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '요청 일자',
     `update_date`          TIMESTAMP    NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
@@ -208,7 +208,8 @@ CREATE TABLE tr_trade_board
     `user_no`            BIGINT          NOT NULL    DEFAULT 0 COMMENT '등록 유저 PK',
     `title`              VARCHAR(20)     NOT NULL    DEFAULT '' COMMENT '글 제목',
     `content`            VARCHAR(100)    NOT NULL    DEFAULT '' COMMENT '글 내용',
-    `image_no`           TEXT            NOT NULL    DEFAULT '0' COMMENT '이미지 PK',
+    `image_no`           JSON            NOT NULL    DEFAULT ('{}') COMMENT '이미지 PK',
+    `product_name`       VARCHAR(20)     NOT NULL    DEFAULT '' COMMENT '판매할 상품 이름',
     `price`              INT             NOT NULL    DEFAULT 0 COMMENT '가격',
     `status`             CHAR(1)         NOT NULL    DEFAULT 't' COMMENT '게시글 상태(t:활성화,a:임시저장,f:삭제)',
     `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록 일자',
@@ -240,9 +241,9 @@ CREATE TABLE tr_visitors_board
     `parents_no`         BIGINT          NOT NULL    DEFAULT 0 COMMENT '부모 보드 PK',
     `comment_count`      INT             NOT NULL    DEFAULT 0 COMMENT '댓글 수',
     `content`            VARCHAR(100)    NOT NULL    DEFAULT '' COMMENT '내용',
-    `status`             CHAR(1)         NOT NULL    DEFAULT 't' COMMENT '게시글 상태 (t:활성화, f:삭제)', 
-    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일', 
-    `update_date`        TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자', 
+    `status`             CHAR(1)         NOT NULL    DEFAULT 't' COMMENT '게시글 상태 (t:활성화, f:삭제)',
+    `registration_date`  TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
+    `update_date`        TIMESTAMP       NOT NULL    DEFAULT current_timestamp COMMENT '업데이트 일자',
      PRIMARY KEY (no)
 );
 

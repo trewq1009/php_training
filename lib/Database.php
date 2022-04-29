@@ -179,11 +179,15 @@ class Database
             if(!$result) {
                 throw new Exception(mysqli_error($this->conn));
             }
-            $data = mysqli_fetch_all($result);
+
+            $listData = [];
+            while($resultData = mysqli_fetch_array($result)) {
+                $listData[] = $resultData;
+            }
             mysqli_free_result($result);
             mysqli_stmt_close($stmt);
 
-            return $data;
+            return $listData;
 
         } catch (Exception $e) {
             return false;

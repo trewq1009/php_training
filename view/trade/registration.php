@@ -22,6 +22,10 @@ try {
             <input type="text" class="form-control" name="boardName" required>
         </div>
         <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">상품 이름</span>
+            <input type="text" class="form-control" name="productName" required>
+        </div>
+        <div class="input-group mb-3">
             <label class="input-group-text" for="inputGroupFile01">이미지</label>
             <input type="file" class="form-control" id="inputGroupFile01" name="imageInfo">
         </div>

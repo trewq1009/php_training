@@ -77,10 +77,10 @@ try {
 
     // 결제 로그 저장
     $paymentLogNo = $db->save('tr_payment_log', ['user_no'=>$auth['no'], 'method'=>'credit', 'payment_mileage'=>$postData['price'],
-                            'payment_information'=>json_encode($information), 'status'=>'success', 'cancels'=>json_encode(['cancel'=>0])], 'isisss');
+                            'payment_information'=>json_encode($information), 'status'=>'t', 'cancels'=>json_encode(['cancel'=>0])], 'isisss');
 
     if(!$paymentLogNo) {
-        throw new DatabaseException();
+        throw new DatabaseException('로그 저장에 실패했습니다.');
     }
 
     // 마일리지 변동 로그 저장
