@@ -248,13 +248,22 @@ class Database
             }
             $whereSql .= "(status = 't' OR status = 'a')";
 
-            $statement = $this->pdo->prepare("SELECT COUNT(*) AS count FROM $tableName WHERE $whereSql");
-            $statement->execute();
-            $total = $statement->fetch();                           // 데이터 총 갯수
+            $totalQuery = "SELECT COUNT(*) AS count FROM $tableName WHERE $whereSql";
+            $totalResult = mysqli_query($this->conn, $totalQuery);
 
-            $statement = $this->pdo->prepare("SELECT * FROM $tableName WHERE $whereSql ORDER BY no DESC LIMIT $calcPage, $resultOnPage");
-            $statement->execute();
-            $listData = $statement->fetchAll();
+            $total = mysqli_fetch_assoc($totalResult);
+            mysqli_free_result($totalResult);
+
+
+            $query = "SELECT * FROM $tableName WHERE $whereSql ORDER BY no DESC LIMIT $calcPage, $resultOnPage";
+            $result = mysqli_query($this->conn, $query);
+
+            $listData = [];
+            while($resultData = mysqli_fetch_array($result)) {
+                $listData[] = $resultData;
+            }
+            mysqli_free_result($result);
+
 
             return [
               'total' => $total['count'],
