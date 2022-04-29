@@ -10,6 +10,7 @@ try {
 
     $db = new Database;
     $listData = $db->list('tr_trade_board', $page, []);
+
     if($listData) {
         $boardList = $listData['listData'];
         unset($listData['listData']);

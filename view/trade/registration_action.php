@@ -13,8 +13,7 @@ try {
     $preUrl = $_SERVER['HTTP_REFERER'];
     $commission = 0.05;
 
-    if (empty($_POST['boardName']) || empty($_POST['productName']) || empty($_POST['productPrice'])
-        || empty($_POST['productRealPrice']) || empty($_POST['productCommission']) || empty($_POST['productInformation'])) {
+    if (empty($_POST['boardName']) || empty($_POST['productPrice']) || empty($_POST['productInformation'])) {
         throw new Exception('필수 데이터를 입력해 주세요');
     }
     if ($_POST['productPrice'] < 1000) {
@@ -23,17 +22,6 @@ try {
     if (!preg_match("/^[0-9]/i", $_POST['productPrice'])) {
         throw new Exception('숫자만 입력해 주세요');
     }
-
-    // 금액 Validation
-    $commissionPrice = $_POST['productPrice'] * $commission;
-    if($commissionPrice != $_POST['productCommission']) {
-        throw new CustomException('기입된 정보가 다릅니다.');
-    }
-    if($_POST['productRealPrice'] != $_POST['productPrice'] - $commissionPrice) {
-        throw new CustomException('기입된 가격 정보가 다릅니다.');
-    }
-
-
 
     if ($_FILES['imageInfo']['name']) {
         $fileName = Utils::fileUpload($_FILES);
@@ -54,16 +42,9 @@ try {
         throw new DatabaseException('이미지 저장에 실패했습니다.');
     }
 
-    // product DB insert
-    $productNo = $db->save('tr_product', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'name'=>$_POST['productName'], 'information'=>$_POST['productInformation'],
-                        'before_price'=>$_POST['productPrice'], 'commission'=>$_POST['productCommission'], 'after_price'=>$_POST['productRealPrice']], 'iissiii');
-    if(!$productNo) {
-        throw new DatabaseException('상품 저장에 실패 했습니다.');
-    }
-
     // board DB insert
-    $boardNo = $db->save('tr_board', ['user_no'=>$_SESSION['auth']['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'board_type'=>'trade', 'reference_no'=>$productNo, 'status'=>'ALIVE'], 'iisssis');
+    $boardNo = $db->save('tr_trade_board', ['user_no'=>$auth['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
+                        'status'=>'t'], 'iisss');
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }

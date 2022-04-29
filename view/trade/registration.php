@@ -22,10 +22,6 @@ try {
             <input type="text" class="form-control" name="boardName" required>
         </div>
         <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">판매할 상품 이름</span>
-            <input type="text" class="form-control" name="productName" required>
-        </div>
-        <div class="input-group mb-3">
             <label class="input-group-text" for="inputGroupFile01">이미지</label>
             <input type="file" class="form-control" id="inputGroupFile01" name="imageInfo">
         </div>
@@ -35,9 +31,9 @@ try {
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">실가격</span>
-            <input type="text" class="form-control" id="realPrice" name="productRealPrice" readonly required>
+            <input type="text" class="form-control" id="realPrice" readonly required>
             <span class="input-group-text" id="basic-addon1">수수료</span>
-            <input type="text" class="form-control" id="commission" name="productCommission" readonly required>
+            <input type="text" class="form-control" id="commission" readonly required>
         </div>
         <div class="input-group">
             <span class="input-group-text">상세 설명</span>
