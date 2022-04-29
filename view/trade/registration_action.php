@@ -5,7 +5,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/view/layout/header.php';
 use app\lib\Database;
 use app\lib\Utils;
 use app\lib\exception\DatabaseException;
-use app\lib\exception\CustomException;
 
 // db connect
 $db = new Database;
@@ -47,7 +46,7 @@ try {
 
     // board DB insert
     $boardNo = $db->save('tr_trade_board', ['user_no'=>$auth['no'], 'image_no'=>$imgNo, 'title'=>$_POST['boardName'], 'content'=>$_POST['productInformation'],
-                        'status'=>'t'], 'iisss');
+                        'price'=>$_POST['productPrice'], 'status'=>'t'], 'iissis');
     if(!$boardNo) {
         throw new DatabaseException('게시물 저장에 실패 했습니다.');
     }
@@ -56,8 +55,7 @@ try {
     header('Location: /view/trade/list.php');
     exit();
 
-} catch (CustomException $e) {
-    $e->setErrorMessages($e);
+
 } catch (DatabaseException $e) {
     mysqli_rollback($db->conn);
     $e->setErrorMessages($e);
