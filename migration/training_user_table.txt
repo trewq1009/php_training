@@ -150,6 +150,7 @@ CREATE UNIQUE INDEX UQ_tr_account_admin_1
 CREATE TABLE tr_image
 (
     `no`                 BIGINT         NOT NULL    AUTO_INCREMENT COMMENT 'AI Index',
+    `image_name`         VARCHAR(17)    NOT NULL    COMMENT '이미지 이름',
     `image_path`         VARCHAR(15)    NOT NULL    COMMENT '이미지 경로',
     `status`             CHAR(1)        NOT NULL    DEFAULT 't' COMMENT '활성화(t), 삭제(f)',
     `registration_date`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp COMMENT '등록일',
@@ -158,6 +159,9 @@ CREATE TABLE tr_image
 );
 
 ALTER TABLE tr_image COMMENT '이미지 테이블';
+
+CREATE UNIQUE INDEX UQ_tr_image_1
+    ON tr_image(image_name);
 
 
 -- tr_trade_log Table Create SQL
@@ -219,6 +223,10 @@ CREATE INDEX IX_tr_trade_board_1
 
 CREATE INDEX IX_tr_trade_board_2
     ON tr_trade_board(user_no, status);
+
+ALTER TABLE tr_trade_board
+    ADD CONSTRAINT FK_tr_trade_board_user_no_tr_account_no FOREIGN KEY (user_no)
+        REFERENCES tr_account (no) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 
 -- tr_visitors_board Table Create SQL

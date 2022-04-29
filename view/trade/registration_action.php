@@ -25,19 +25,22 @@ try {
 
     if ($_FILES['imageInfo']['name']) {
         $fileName = Utils::fileUpload($_FILES);
+        $filePath = '/upload/';
         if (!$fileName) {
             throw new Exception('파일 저장에 실패하였습니다.');
         }
     } else {
         // 이미지 없으면 기본 이미지 적용
-        $fileName = "default/basic.svg";
+        $fileName = "basic.svg";
+        $filePath = '/default/';
+
     }
 
 
     mysqli_autocommit($db->conn, FALSE);
 
     // image DB insert
-    $imgNo = $db->save('tr_image', ['image_name' => $fileName, 'image_path' => '/upload/'], 'ss');
+    $imgNo = $db->save('tr_image', ['image_name' => $fileName, 'image_path' => $filePath], 'ss');
     if (!$imgNo) {
         throw new DatabaseException('이미지 저장에 실패했습니다.');
     }

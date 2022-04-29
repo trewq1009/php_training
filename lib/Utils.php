@@ -36,11 +36,6 @@ class Utils
     public static function fileUpload($fileData)
     {
         try {
-            // 수정 사항 22.04.29 미완
-            // 이미지 이름을 DB 컬럼에서 제외했고
-            // 이미지 저장할 때에는 DB 저장 후 Index를 추출해
-            // 이미지 이름에 사용 예): 343(DBno).확장자
-
             // 임시 저장소
             $tempFile = $fileData['imageInfo']['tmp_name'];
             // 파일타입 및 확장자 가져오기
